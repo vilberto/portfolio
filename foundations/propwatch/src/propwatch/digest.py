@@ -1,0 +1,6 @@
+def send_daily_digest(new_listings: list[dict]) -> None:
+    ...
+
+
+def send_weekly_auction_summary(listings: list[dict]) -> None:
+    ...

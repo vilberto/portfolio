@@ -1,0 +1,5 @@
+# Pin versions after: pip install -e . && pip freeze > requirements.txt
+httpx>=0.27
+beautifulsoup4>=4.12
+lxml>=5.0
+python-dotenv>=1.0
