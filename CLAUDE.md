@@ -20,8 +20,7 @@ portfolio/
 │   ├── graph/          # LangGraph agent
 │   └── rag/            # ChromaDB + Ollama RAG layer
 └── foundations/        # Foundational skills track
-    ├── alerter-v2/     # Alerting pipeline, iteration 2
-    ├── alerter-v3/     # Alerting pipeline, iteration 3
+    ├── propwatch/     # Property listing alerts + auction digest
     └── mcp-server/     # MCP server implementation
 ```
 
@@ -54,8 +53,7 @@ Stack: RAG, ChromaDB, Ollama, FastAPI, Streamlit, LangGraph
 
 Three progressively more complex projects that build core engineering muscle before the hero projects:
 
-- **alerter-v2** — price drop alerter with real pytest suite and CI/CD via GitHub Actions
-- **alerter-v3** — extends v2 with Shopify API integration and scheduled cron via GitHub Actions
+- **propwatch** — Melbourne property listing alerter; scrapes Domain.com.au, detects new listings matching saved filters, sends daily email digest and weekly auction summary via GitHub Actions cron
 - **mcp-server** — Custom MCP server exposing ScentMatch recommender as tools — testable in Claude Desktop
 
 ## Non-negotiable engineering habits
