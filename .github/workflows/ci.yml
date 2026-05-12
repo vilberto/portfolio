@@ -19,7 +19,9 @@ jobs:
         with:
           python-version: "3.12"
 
-      - run: pip install -r foundations/propwatch/requirements-dev.txt
+      - run: |
+          pip install -r foundations/propwatch/requirements.txt
+          pip install -r foundations/propwatch/requirements-dev.txt
 
       - run: ruff check .
 
