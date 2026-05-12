@@ -2,7 +2,9 @@
 
 ## Purpose
 
-Upskilling from analytics lead to AI/analytics engineer, targeting senior roles at Quantium and similar data-platform companies. Every project here is production-quality by intent: real data, real APIs, deployable services, engineering habits that pass a technical screen.
+Two production-quality data products and a foundations track, built to demonstrate
+AI/analytics engineering capability: real APIs, deployable services, and engineering
+habits that hold up under a technical screen.
 
 ## Repo layout
 
@@ -63,6 +65,11 @@ Three progressively more complex projects that build core engineering muscle bef
 - `.env` is gitignored and must never be committed; `.env.example` documents required keys with placeholder values
 - If a new secret is needed, add the key to `.env.example` and the value to `.env` locally — never the reverse
 
+**Code review bar**
+- Code should be legible to someone who has never seen this repo: clear naming, no magic
+  constants, no commented-out code
+- All packages use `src/` layout and are installed as editable packages
+
 **Claude Code suggestions**
 - Verify every suggestion against the relevant library's current documentation before running it
 - Do not run generated shell commands or SQL without reading them first
@@ -73,6 +80,14 @@ Three progressively more complex projects that build core engineering muscle bef
 - No generated files, build artefacts, or local config committed
 - Branch names follow `<type>/<short-slug>` (e.g. `feat/propintel-dbt-models`)
 
-## Target audience for code review
+## Machine
 
-Senior engineers at Quantium, domain-expert data engineers, and ML platform engineers. Code should be legible to someone who has never seen this repo: clear naming, no magic constants, no commented-out code.
+Mac Intel (not Apple Silicon). Use correct flags for Docker, Ollama, and platform builds.
+Python 3.12.2. Use venv (not pyenv).
+
+Each project has its own venv at `<project-root>/.venv/`.
+Before running any tests or scripts:
+1. `pip install -e .` — installs the package in editable mode
+2. `source .venv/bin/activate` — activates the venv
+
+Run `pip install -e .` at the start of every new Claude Code session.
