@@ -68,4 +68,13 @@ async def fetch_all_listings(config: SearchConfig) -> list[dict]:
             await asyncio.sleep(random.uniform(2.0, 3.0))
             all_listings.extend(await fetch_page(client, config, page))
 
-    return all_listings
+    # Domain surfaces promoted listings on multiple pages; deduplicate by ID,
+    # preserving first-seen order.
+    seen: set[str] = set()
+    unique: list[dict] = []
+    for listing in all_listings:
+        key = str(listing["id"])
+        if key not in seen:
+            seen.add(key)
+            unique.append(listing)
+    return unique

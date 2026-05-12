@@ -199,6 +199,22 @@ def test_fetch_all_listings_delay_uses_uniform_range(monkeypatch):
     sleep_mock.assert_awaited_once_with(2.5)
 
 
+def test_fetch_all_listings_deduplicates_promoted_listings(monkeypatch):
+    cfg = SearchConfig(suburbs=["bulleen-vic-3105"])
+    # _LISTING_1 (id 2001) appears on both pages, simulating a promoted listing
+    page1 = _make_html({"2001": _LISTING_1, "2002": _LISTING_2}, total_pages=2)
+    page2 = _make_html({"2001": _LISTING_1}, total_pages=2)
+
+    sleep_mock = AsyncMock()
+    monkeypatch.setattr("propwatch.scraper.asyncio.sleep", sleep_mock)
+    monkeypatch.setattr("propwatch.scraper.httpx.AsyncClient", lambda **kw: _MockClient([page1, page2]))
+
+    listings = asyncio.run(fetch_all_listings(cfg))
+
+    assert len(listings) == 2
+    assert {lst["id"] for lst in listings} == {2001, 2002}
+
+
 def test_fetch_all_listings_three_pages_two_delays(monkeypatch):
     cfg = SearchConfig(suburbs=["bulleen-vic-3105"])
     pages = [
