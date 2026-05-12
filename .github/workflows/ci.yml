@@ -22,6 +22,7 @@ jobs:
       - run: |
           pip install -r foundations/propwatch/requirements.txt
           pip install -r foundations/propwatch/requirements-dev.txt
+          pip install -e foundations/propwatch/
 
       - run: ruff check .
 
