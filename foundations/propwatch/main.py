@@ -4,8 +4,6 @@ import traceback
 
 from dotenv import load_dotenv
 
-load_dotenv()
-
 from propwatch.config import DEFAULT_CONFIG
 from propwatch.digest import send_daily_digest, send_email
 from propwatch.scraper import fetch_all_listings
@@ -20,6 +18,7 @@ log = logging.getLogger(__name__)
 
 
 async def _run() -> None:
+    load_dotenv()
     log.info("Loading config: %d suburbs, max price $%s", len(DEFAULT_CONFIG.suburbs), f"{DEFAULT_CONFIG.max_price:,}")
 
     log.info("Fetching listings from Domain…")

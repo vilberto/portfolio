@@ -1,7 +1,5 @@
 import json
 
-import pytest
-
 from propwatch import store as store_mod
 from propwatch.store import (
     filter_new_listings,
