@@ -13,7 +13,19 @@ _HEADERS = {
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/124.0.0.0 Safari/537.36"
     ),
+    "Accept": (
+        "text/html,application/xhtml+xml,application/xml;q=0.9,"
+        "image/avif,image/webp,image/apng,*/*;q=0.8,"
+        "application/signed-exchange;v=b3;q=0.7"
+    ),
     "Accept-Language": "en-AU,en;q=0.9",
+    "Accept-Encoding": "gzip, deflate, br",
+    "Cache-Control": "max-age=0",
+    "Upgrade-Insecure-Requests": "1",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
 }
 
 
@@ -29,7 +41,12 @@ def _parse_page_html(html: str) -> tuple[list[dict], int]:
     component_props = data["props"]["pageProps"]["componentProps"]
     total_pages: int = component_props.get("totalPages", 1)
     listings_map: dict = component_props.get("listingsMap", {})
-    return list(listings_map.values()), total_pages
+    # Hoist listingModel fields to top level — Domain nests all useful data there
+    listings = [
+        {k: v for k, v in lst.items() if k != "listingModel"} | lst.get("listingModel", {})
+        for lst in listings_map.values()
+    ]
+    return listings, total_pages
 
 
 async def fetch_page(client: httpx.AsyncClient, config: SearchConfig, page: int) -> list[dict]:

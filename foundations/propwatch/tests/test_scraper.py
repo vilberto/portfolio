@@ -9,24 +9,30 @@ from propwatch.scraper import _parse_page_html, fetch_all_listings, fetch_page
 
 _LISTING_1 = {
     "id": 2001,
-    "url": "/property-profile/2001",
-    "address": {"street": "1 Main St", "suburb": "Bulleen", "postcode": "3105", "lat": -37.75, "lng": 145.08},
-    "features": {"beds": 4, "baths": 2, "parking": 2, "propertyType": "house", "landSize": 650},
-    "price": "$1,200,000",
-    "inspection": {"openTime": None, "closeTime": None},
-    "auction": None,
-    "tags": {"tagText": "New"},
+    "listingType": "house",
+    "listingModel": {
+        "url": "/property-profile/2001",
+        "address": {"street": "1 Main St", "suburb": "Bulleen", "postcode": "3105", "lat": -37.75, "lng": 145.08},
+        "features": {"beds": 4, "baths": 2, "parking": 2, "propertyType": "house", "landSize": 650},
+        "price": "$1,200,000",
+        "inspection": {"openTime": None, "closeTime": None},
+        "auction": None,
+        "tags": {"tagText": "New"},
+    },
 }
 
 _LISTING_2 = {
     "id": 2002,
-    "url": "/property-profile/2002",
-    "address": {"street": "2 Oak Ave", "suburb": "Doncaster", "postcode": "3108", "lat": -37.78, "lng": 145.12},
-    "features": {"beds": 3, "baths": 2, "parking": 1, "propertyType": "house", "landSize": 500},
-    "price": "$950,000",
-    "inspection": {"openTime": "2026-05-15T10:00:00", "closeTime": "2026-05-15T10:30:00"},
-    "auction": None,
-    "tags": {"tagText": None},
+    "listingType": "house",
+    "listingModel": {
+        "url": "/property-profile/2002",
+        "address": {"street": "2 Oak Ave", "suburb": "Doncaster", "postcode": "3108", "lat": -37.78, "lng": 145.12},
+        "features": {"beds": 3, "baths": 2, "parking": 1, "propertyType": "house", "landSize": 500},
+        "price": "$950,000",
+        "inspection": {"openTime": "2026-05-15T10:00:00", "closeTime": "2026-05-15T10:30:00"},
+        "auction": None,
+        "tags": {"tagText": None},
+    },
 }
 
 
