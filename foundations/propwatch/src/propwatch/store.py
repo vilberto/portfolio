@@ -12,7 +12,8 @@ def load_store() -> dict[str, str | None]:
     text = SEEN_IDS_PATH.read_text()
     if not text.strip():
         return {}
-    return json.loads(text)
+    data = json.loads(text)
+    return data if isinstance(data, dict) else {}
 
 
 def purge_stale_ids(store: dict[str, str | None], listings: list[dict]) -> None:
