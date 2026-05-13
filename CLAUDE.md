@@ -41,15 +41,21 @@ Stack: Domain API, dbt, DuckDB, Prefect, FastAPI, Pydeck
 
 ## Hero project 2 — ScentMatch
 
-Fragrance discovery app that uses RAG + a LangGraph agent to match users to fragrances from natural-language descriptions. Local-first: Ollama runs the LLM, ChromaDB stores embeddings, Streamlit is the UI.
+Fragrance discovery app that uses RAG + a LangGraph agent to match users to fragrances from natural-language descriptions.
+
+**Inference strategy — important:**
+- Embeddings: nomic-embed-text via Ollama (local, fast enough on CPU)
+- Generation: Claude API (Sonnet) — Mac Intel has no Metal GPU acceleration; Ollama generation runs CPU-only at ~2–5 tokens/sec, which is too slow for iterative dev. Use Claude API from day 1.
+- Claude API key lives in `.env` as `ANTHROPIC_API_KEY`. Console account is separate from the claude.ai subscription.
 
 Key design goals:
-- RAG pipeline (ChromaDB + Ollama) must run fully offline after initial data ingestion
+- RAG pipeline (ChromaDB + Ollama embeddings) must run fully offline after initial data ingestion
 - LangGraph agent owns conversation state; FastAPI is a thin HTTP wrapper, not business logic
 - Streamlit frontend calls FastAPI only; it has no direct access to ChromaDB or the graph
 - Embeddings are generated once and persisted; regenerating them requires an explicit CLI flag
+- Document construction matters: fragrance note data is sparse — combine notes, accords, description, and review text into one rich document per fragrance before embedding, or retrieval quality suffers
 
-Stack: RAG, ChromaDB, Ollama, FastAPI, Streamlit, LangGraph
+Stack: RAG, ChromaDB, Ollama (embeddings), Claude API (generation), FastAPI, Streamlit, LangGraph
 
 ## Foundations track
 
