@@ -43,18 +43,21 @@ Browser-accurate headers do not bypass this — the block is IP-based, not heade
 
 **Workaround confirmed 2026-05-12:** scraper ran correctly from a residential IP.
 
-## Akamai Bot Manager block — residential IP (confirmed 2026-05-13)
-Domain deployed Akamai Bot Manager at the edge. As of 2026-05-13, even plain `curl`
-with browser-accurate headers is denied from a residential IP (`edgesuite.net` reference
-in response body). The block is no longer IP-range-based — it classifies any non-browser
-HTTP client as a bot.
+## Akamai Bot Manager block — root cause confirmed (2026-05-13)
+Domain deployed Akamai Bot Manager at the edge. Plain httpx requests return 403
+regardless of IP origin. Root cause: Akamai requires valid session cookies (`bm_sz`,
+`bm_sc`, `_abck`, `ak_bmsc` and related) that are set by JavaScript on first page load.
+Without these cookies all requests are blocked at the edge.
 
-**Impact:** `__NEXT_DATA__` scraping approach is no longer viable without a real browser
-runtime (Playwright/Selenium). Domain's official listing API requires a commercial
-agreement. **Propwatch is currently broken.**
+**Confirmed via:**
+- `curl` with full browser headers but no cookies → 403
+- `curl` with full browser headers + cookies copied from DevTools → 200, listings returned
+- Browser loads page normally → confirms residential IP is not blocked, only cookieless
+  HTTP clients
 
-**Options considered:**
-- Playwright/Selenium headless browser — would bypass Akamai but adds significant
-  complexity and resource overhead for a cron job
-- Domain official API — requires commercial agreement, not available
-- Alternative data source — e.g. realestate.com.au or a paid property data provider
+**Fix:** Use Playwright to load the page once and harvest the Akamai cookies, then pass
+those cookies to httpx for all subsequent scrape requests. Re-harvest when a 403 is
+detected. This avoids running a full browser for every request.
+
+**Status:** Deferred to Session 7 (Async Python + Scraping), where Playwright is already
+on the curriculum.
