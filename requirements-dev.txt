@@ -1,0 +1,2 @@
+# Repo-wide dev tooling — install outside any project venv
+pre-commit>=4.0
