@@ -11,7 +11,7 @@ _HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/124.0.0.0 Safari/537.36"
+        "Chrome/136.0.0.0 Safari/537.36"
     ),
     "Accept": (
         "text/html,application/xhtml+xml,application/xml;q=0.9,"
@@ -22,6 +22,9 @@ _HEADERS = {
     "Accept-Encoding": "gzip, deflate, br",
     "Cache-Control": "max-age=0",
     "Upgrade-Insecure-Requests": "1",
+    "Sec-CH-UA": '"Chromium";v="136", "Google Chrome";v="136", "Not.A/Brand";v="99"',
+    "Sec-CH-UA-Mobile": "?0",
+    "Sec-CH-UA-Platform": '"macOS"',
     "Sec-Fetch-Dest": "document",
     "Sec-Fetch-Mode": "navigate",
     "Sec-Fetch-Site": "none",
@@ -43,13 +46,16 @@ def _parse_page_html(html: str) -> tuple[list[dict], int]:
     listings_map: dict = component_props.get("listingsMap", {})
     # Hoist listingModel fields to top level — Domain nests all useful data there
     listings = [
-        {k: v for k, v in lst.items() if k != "listingModel"} | lst.get("listingModel", {})
+        {k: v for k, v in lst.items() if k != "listingModel"}
+        | lst.get("listingModel", {})
         for lst in listings_map.values()
     ]
     return listings, total_pages
 
 
-async def fetch_page(client: httpx.AsyncClient, config: SearchConfig, page: int) -> list[dict]:
+async def fetch_page(
+    client: httpx.AsyncClient, config: SearchConfig, page: int
+) -> list[dict]:
     response = await client.get(config.search_url(page))
     response.raise_for_status()
     listings, _ = _parse_page_html(response.text)

@@ -41,6 +41,20 @@ Domain.com.au returns 403 when requests originate from GitHub Actions runner IPs
 (standard `ubuntu-latest` hosted runners use Azure datacenter ranges).
 Browser-accurate headers do not bypass this — the block is IP-based, not header-based.
 
-**Workaround confirmed:** scraper runs correctly from a residential IP (verified locally).
-Running the workflow on a self-hosted runner on a residential machine would resolve this.
-Alternatively, migrate to the Domain.com.au official listing API (requires API key).
+**Workaround confirmed 2026-05-12:** scraper ran correctly from a residential IP.
+
+## Akamai Bot Manager block — residential IP (confirmed 2026-05-13)
+Domain deployed Akamai Bot Manager at the edge. As of 2026-05-13, even plain `curl`
+with browser-accurate headers is denied from a residential IP (`edgesuite.net` reference
+in response body). The block is no longer IP-range-based — it classifies any non-browser
+HTTP client as a bot.
+
+**Impact:** `__NEXT_DATA__` scraping approach is no longer viable without a real browser
+runtime (Playwright/Selenium). Domain's official listing API requires a commercial
+agreement. **Propwatch is currently broken.**
+
+**Options considered:**
+- Playwright/Selenium headless browser — would bypass Akamai but adds significant
+  complexity and resource overhead for a cron job
+- Domain official API — requires commercial agreement, not available
+- Alternative data source — e.g. realestate.com.au or a paid property data provider
