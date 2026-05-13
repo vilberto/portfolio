@@ -1,5 +1,7 @@
 # Portfolio
 
+[![CI](https://github.com/vilberto/portfolio/actions/workflows/ci.yml/badge.svg)](https://github.com/vilberto/portfolio/actions/workflows/ci.yml)
+
 ## Setup
 
 ### Pre-commit hooks (run once, repo-wide)
