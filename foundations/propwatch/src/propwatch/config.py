@@ -1,4 +1,12 @@
+import os
 from dataclasses import dataclass, field
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+USE_BRIGHTDATA: bool = os.getenv("USE_BRIGHTDATA", "false").lower() == "true"
+BRIGHTDATA_API_TOKEN: str = os.getenv("BRIGHTDATA_API_TOKEN", "")
 
 _BASE_URL = "https://www.domain.com.au/sale/"
 

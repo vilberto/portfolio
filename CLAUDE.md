@@ -61,7 +61,7 @@ Stack: RAG, ChromaDB, Ollama (embeddings), Claude API (generation), FastAPI, Str
 
 Three progressively more complex projects that build core engineering muscle before the hero projects:
 
-- **propwatch** — Melbourne property listing alerter; scrapes Domain.com.au, detects new listings matching saved filters, sends daily email digest and weekly auction summary via GitHub Actions cron
+- **propwatch** — Melbourne property listing alerter (learning artefact); scraper, deduplication, HTML digest, and GitHub Actions CI are complete. Domain.com.au confirmed inaccessible to individual developers — Akamai block and robots.txt enforcement both confirmed. Data source closed; see foundations/propwatch/SPIKE.md.
 - **mcp-server** — Custom MCP server exposing ScentMatch recommender as tools — testable in Claude Desktop
 
 ## Non-negotiable engineering habits

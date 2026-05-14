@@ -55,9 +55,30 @@ Without these cookies all requests are blocked at the edge.
 - Browser loads page normally → confirms residential IP is not blocked, only cookieless
   HTTP clients
 
-**Fix:** Use Playwright to load the page once and harvest the Akamai cookies, then pass
-those cookies to httpx for all subsequent scrape requests. Re-harvest when a 403 is
-detected. This avoids running a full browser for every request.
+**Fix attempted — Playwright spike (2026-05-14):**
+Playwright tested across three modes on a residential IP: headful, headless, and
+headless + playwright-stealth. All three returned the Akamai/Edgesuite access denied
+page (`errors.edgesuite.net`). Headful being blocked rules out headless detection as
+the root cause — Akamai is catching browser fingerprint signals from a fresh Playwright
+Chromium instance (no history, no extensions, clean state, non-standard TLS fingerprint).
 
-**Status:** Deferred to Session 7 (Async Python + Scraping), where Playwright is already
-on the curriculum.
+**Bright Data Unlocker attempted (2026-05-14):**
+Request rejected at the Bright Data layer before reaching Domain:
+`bad_endpoint: Requested site is not available for immediate access mode in accordance
+with robots.txt.`
+Domain.com.au's robots.txt explicitly disallows scraping. Bright Data's "full access"
+bypass requires a commercial account manager arrangement — not available to individual
+developers. Other enterprise proxy providers (Oxylabs etc.) have the same KYC and
+robots.txt compliance posture.
+
+## Final verdict — NO-GO (updated 2026-05-14)
+
+Domain.com.au is closed to individual developers by both technical and policy controls:
+- Akamai Bot Manager blocks all non-browser HTTP clients at the edge
+- Playwright (including headful mode) blocked by browser fingerprinting
+- robots.txt disallows scraping; enterprise proxy providers enforce this
+- Official Domain API requires a commercial agreement
+
+PropWatch is shelved as a live data source. The scraper, deduplication logic, HTML
+digest, and GitHub Actions CI are complete and remain as learning artefacts. The
+data access layer will not be revisited without a legitimate API agreement.

@@ -5,7 +5,9 @@ import random
 import httpx
 from bs4 import BeautifulSoup
 
-from propwatch.config import SearchConfig
+from propwatch.config import BRIGHTDATA_API_TOKEN, USE_BRIGHTDATA, SearchConfig
+
+_BRIGHTDATA_API_URL = "https://api.brightdata.com/request"
 
 _HEADERS = {
     "User-Agent": (
@@ -32,6 +34,30 @@ _HEADERS = {
 }
 
 
+async def _fetch_html(
+    client: httpx.AsyncClient, url: str, brightdata_token: str | None = None
+) -> str:
+    if brightdata_token:
+        response = await client.post(
+            _BRIGHTDATA_API_URL,
+            json={
+                "zone": "web_unlocker1",
+                "url": url,
+                "format": "raw",
+                "method": "GET",
+                "country": "au",
+            },
+            headers={
+                "Authorization": f"Bearer {brightdata_token}",
+                "Content-Type": "application/json",
+            },
+        )
+    else:
+        response = await client.get(url)
+    response.raise_for_status()
+    return response.text
+
+
 def _parse_page_html(html: str) -> tuple[list[dict], int]:
     soup = BeautifulSoup(html, "lxml")
     tag = soup.find("script", id="__NEXT_DATA__")
@@ -54,25 +80,31 @@ def _parse_page_html(html: str) -> tuple[list[dict], int]:
 
 
 async def fetch_page(
-    client: httpx.AsyncClient, config: SearchConfig, page: int
+    client: httpx.AsyncClient,
+    config: SearchConfig,
+    page: int,
+    brightdata_token: str | None = None,
 ) -> list[dict]:
-    response = await client.get(config.search_url(page))
-    response.raise_for_status()
-    listings, _ = _parse_page_html(response.text)
+    html = await _fetch_html(client, config.search_url(page), brightdata_token)
+    listings, _ = _parse_page_html(html)
     return listings
 
 
 async def fetch_all_listings(config: SearchConfig) -> list[dict]:
-    async with httpx.AsyncClient(headers=_HEADERS, follow_redirects=True) as client:
-        response = await client.get(config.search_url(1))
-        response.raise_for_status()
-        first_page_listings, total_pages = _parse_page_html(response.text)
+    token = BRIGHTDATA_API_TOKEN if USE_BRIGHTDATA else None
+    client_kwargs = (
+        {} if USE_BRIGHTDATA else {"headers": _HEADERS, "follow_redirects": True}
+    )
+
+    async with httpx.AsyncClient(**client_kwargs) as client:
+        html = await _fetch_html(client, config.search_url(1), token)
+        first_page_listings, total_pages = _parse_page_html(html)
 
         all_listings = list(first_page_listings)
 
         for page in range(2, total_pages + 1):
             await asyncio.sleep(random.uniform(2.0, 3.0))
-            all_listings.extend(await fetch_page(client, config, page))
+            all_listings.extend(await fetch_page(client, config, page, token))
 
     # Domain surfaces promoted listings on multiple pages; deduplicate by ID,
     # preserving first-seen order.
