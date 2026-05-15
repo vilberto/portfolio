@@ -1,8 +1,8 @@
 name: PropWatch daily listing digest
 
 on:
-  schedule:
-    - cron: "0 9 * * *"  # 19:00 AEST
+  # schedule disabled — Domain.com.au is blocked by Akamai; data source closed
+  # - cron: "0 9 * * *"  # 19:00 AEST
   workflow_dispatch:
 
 jobs:
