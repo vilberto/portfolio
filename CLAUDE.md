@@ -141,6 +141,35 @@ Pydeck (Carto basemap), LangGraph
 
 ---
 
+## Deployment notes
+
+### Data layer
+- Local development: ingestion pipeline writes to `data/raw/` and
+  `data/processed/`. Both directories are gitignored.
+- Cloud target (Session 19): GCS replaces the local file system.
+  - `ingestion.run` stays unchanged — fetches from source to `data/raw/` locally
+  - A separate `ingestion.upload` step (not yet built) pushes `data/raw/`
+    and `data/processed/` to GCS after ingestion
+  - FastAPI and dbt read from GCS/BigQuery in cloud context
+
+### Planning shapefiles
+- Download manually from Koordinates (free, requires checkout):
+  discover.data.vic.gov.au — search "Vicmap Planning scheme zone codelist"
+  and "Vicmap Planning scheme overlay codelist"
+- Select: ESRI Shapefile, Geographicals on GDA2020
+- Place in `data/raw/planning/` before running planning ingestion
+- Upload to GCS via `ingestion.upload` in cloud deployment — no special
+  handling beyond the manual download step
+
+### CI/CD (Session 19)
+- GitHub Actions handles test → build → deploy on push to main
+- Ingestion is outside CI/CD — it's a scheduled operational concern,
+  not triggered by code pushes
+- Auction scraper requires residential IP — stays local or routes
+  through a residential proxy in cloud context
+
+---
+
 ## Foundations track
 
 - **propwatch** — Melbourne property listing alerter (learning artefact); scraper, deduplication, HTML digest, and GitHub Actions CI are complete. Domain.com.au confirmed inaccessible to individual developers — Akamai block and robots.txt enforcement both confirmed. Data source closed; see foundations/propwatch/SPIKE.md.
