@@ -15,6 +15,8 @@ VIC_EDUCATION_DIR = RAW_DIR / "vic-education"
 VICMAP_PLANNING_RAW_DIR = RAW_DIR / "vicmap-planning"
 OSM_DIR = RAW_DIR / "osm"
 AUCTION_DIR = RAW_DIR / "auction"
+AUCTION_URL = "https://www.domain.com.au/auction-results/melbourne/"
+
 VICMAP_PLANNING_PROCESSED_DIR = PROCESSED_DIR / "vicmap-planning"
 
 # --- ABS ---

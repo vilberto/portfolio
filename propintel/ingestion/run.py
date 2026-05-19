@@ -14,6 +14,8 @@ Individual commands:
     vcaa-sscai               VCAA SSCAI all years (XLSX × n, idempotent per year)
     vic-education-zones      Victorian school zone boundaries (ZIP → SHP)
     vic-education-locations  DataVic school locations crosscheck (CSV)
+    auction                  Domain Melbourne auction results (latest week)
+    auction-backfill         Domain Melbourne auction results (all available history)
 
 Group commands:
     abs           abs-seifa, abs-census, abs-sal-boundary
@@ -24,11 +26,20 @@ Group commands:
 
 Note: VicGov property sales is Cloudflare-protected — manual download required.
 See CLAUDE.md deployment notes for instructions.
-Note: vicmap-planning, osm, and auction are handled separately.
+Note: vicmap-planning and osm are handled separately.
+Note: auction and auction-backfill require residential IP (Akamai blocks cloud IPs).
+      First-time setup: playwright install chromium
 """
 
 import asyncio
+import logging
 import sys
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    datefmt="%H:%M:%S",
+)
 
 _ABS = ["abs-seifa", "abs-census", "abs-sal-boundary"]
 _DFFH_RENT = ["dffh-rent-moving-annual"]
@@ -45,6 +56,8 @@ _COMMANDS = {
     "vcaa-sscai": ("ingestion.vcaa_sscai", "fetch_sscai"),
     "vic-education-zones": ("ingestion.vic_education", "fetch_school_zones"),
     "vic-education-locations": ("ingestion.vic_education", "fetch_school_locations"),
+    "auction": ("ingestion.auction", "fetch_auction_results"),
+    "auction-backfill": ("ingestion.auction", "fetch_auction_backfill"),
 }
 
 _GROUPS = {
