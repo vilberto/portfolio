@@ -23,13 +23,7 @@ See [ingestion/README.md](ingestion/README.md) for commands, manual-seed sources
 
 ## Tests
 
-Tests verify downloaded file structure. They skip (not fail) if data has not been seeded.
-
-```bash
-python -m pytest tests/ -v
-```
-
-Seed all programmatic sources first for full coverage:
+Tests are organised by layer under `tests/`. Seed data before running — tests skip (not fail) if data is absent.
 
 ```bash
 python -m ingestion.run all
