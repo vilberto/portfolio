@@ -71,13 +71,16 @@ with planning data.
 
 ---
 
+**VicGov Property Sales** — source of truth for all four URLs below:
+`https://www.land.vic.gov.au/valuations/resources-and-reports/property-sales-statistics`
+
 ### VicGov Median House Price — Time Series
 **Status:** ✅ GO  
-**URL:** `https://www.land.vic.gov.au/__data/assets/excel_doc/0029/709751/Houses-by-suburb-2013-2023.xlsx`  
+**URL:** `https://www.land.vic.gov.au/__data/assets/excel_doc/0032/756581/houses-by-suburb-2014-2024.xlsx`  
 **Format:** XLSX  
 **Granularity:** Suburb name string  
-**Update frequency:** Annual — typically mid-year; URL will change when updated, check land.vic.gov.au  
-**Notes:** Covers 2013–2023. Primary source for price trend analysis (1y, 5y, 10y
+**Update frequency:** Annual — typically mid-year; copy new URL from landing page above  
+**Notes:** Covers 2014–2024. Primary source for price trend analysis (1y, 5y, 10y
 change). Suburb names require normalisation before joining to SAL spine.
 
 ---
@@ -87,19 +90,18 @@ change). Suburb names require normalisation before joining to SAL spine.
 **URL:** `https://www.land.vic.gov.au/__data/assets/excel_doc/0033/756582/units-by-suburb-2014-2024.xlsx`  
 **Format:** XLSX  
 **Granularity:** Suburb name string  
-**Update frequency:** Annual — typically mid-year; URL will change when updated, check land.vic.gov.au  
+**Update frequency:** Annual — typically mid-year; copy new URL from landing page above  
 **Notes:** Covers 2014–2024. Same normalisation requirement as house price series.
 
 ---
 
 ### VicGov Median House Price — Quarterly
 **Status:** ✅ GO (with caveat)  
-**URL:** `https://www.land.vic.gov.au/__data/assets/excel_doc/0023/762143/median-house-q2-2025.xls`  
+**URL:** `https://www.land.vic.gov.au/__data/assets/excel_doc/0036/766719/median-house-q3-2025.xls`  
 **Format:** XLS  
 **Granularity:** Suburb name string  
 **Update frequency:** Quarterly — publishes ~6 weeks after quarter end (approx. Feb, May, Aug, Nov)  
-**Caveat:** Quarter is hardcoded in the URL. URL must be manually updated in config
-each quarter. No stable programmatic URL pattern confirmed.  
+**Caveat:** Quarter is hardcoded in the URL. Copy new URL from landing page above each quarter.  
 **Notes:** Used to supplement the time series with the most recent quarter's data.
 Combined in dbt: time series provides trend, quarterly provides latest data point.
 
@@ -107,23 +109,24 @@ Combined in dbt: time series provides trend, quarterly provides latest data poin
 
 ### VicGov Median Unit Price — Quarterly
 **Status:** ✅ GO (with caveat)  
-**URL:** `https://www.land.vic.gov.au/__data/assets/excel_doc/0025/762145/median-unit-q2-2025.xls`  
+**URL:** `https://www.land.vic.gov.au/__data/assets/excel_doc/0028/766720/median-unit-q3-2025.xls`  
 **Format:** XLS  
 **Granularity:** Suburb name string  
 **Update frequency:** Quarterly — publishes ~6 weeks after quarter end (approx. Feb, May, Aug, Nov)  
-**Caveat:** Same URL instability as house quarterly. Manual update required.
+**Caveat:** Quarter is hardcoded in the URL. Copy new URL from landing page above each quarter.
 
 ---
 
 ### DFFH Median Rent — Quarterly
 **Status:** ✅ GO (with caveat)  
+**Landing page:** `https://www.dffh.vic.gov.au/publications/rental-report`  
 **URLs:**  
 - By property type: `https://www.dffh.vic.gov.au/tables-rental-report-september-quarter-2025-excel`  
 - Moving annual (all types): `https://www.dffh.vic.gov.au/moving-annual-rent-suburb-september-quarter-2025-excel`  
 **Format:** XLSX (redirect)  
 **Granularity:** Suburb name string  
 **Update frequency:** Quarterly — publishes ~6 weeks after quarter end (approx. Feb, May, Aug, Nov)  
-**Caveat:** Quarter is embedded in URL slug. Manual update required each quarter.  
+**Caveat:** Quarter is embedded in URL slug. Copy new URLs from landing page above each quarter.  
 **Notes:** Two files provide different granularity — by property type and all-types
 aggregate. Ingest both; dbt determines which feeds `suburb_metrics`.
 
@@ -200,10 +203,10 @@ load. Spatial intersection with SAL boundaries computed in GeoPandas and stored 
 **Granularity:** Polygon (all of Victoria)  
 **Update frequency:** Irregular — manual re-fetch when scheme amendments warrant it  
 **File size:** ~130MB  
-**Manual steps:** Download via Koordinates free checkout. Place in `data/raw/planning/`.  
+**Manual steps:** Download via Koordinates free checkout. Place in `data/raw/vicmap-planning/`.  
 **Key fields:** `ZONE_CODE`, `ZONE_CODE_GROUP`, `ZONE_CODE_GROUP_LABEL`, `LGA`, `LGA_CODE`  
 **Notes:** Gitignored (too large for repo). Document in README. Ingestion script
-filters to Melbourne LGAs on load and saves GeoParquet to `data/processed/planning/`.
+filters to Melbourne LGAs on load and saves GeoParquet to `data/processed/vicmap-planning/`.
 `ZONE_CODE_GROUP` used to classify residential zone types without hardcoding
 individual code variants (NRZ1, NRZ2, GRZ1, GRZ2, etc.).
 
@@ -216,7 +219,7 @@ individual code variants (NRZ1, NRZ2, GRZ1, GRZ2, etc.).
 **Granularity:** Polygon (all of Victoria)  
 **Update frequency:** Irregular — manual re-fetch when scheme amendments warrant it  
 **File size:** ~650MB  
-**Manual steps:** Download via Koordinates free checkout. Place in `data/raw/planning/`.  
+**Manual steps:** Download via Koordinates free checkout. Place in `data/raw/vicmap-planning/`.  
 **Key fields:** `ZONE_CODE`, `ZONE_CODE_GROUP`, `ZONE_CODE_GROUP_LABEL`, `CODE_PARENT`, `LGA`, `LGA_CODE`  
 **Notes:** Gitignored (too large for repo). Ingestion script filters to Melbourne
 LGAs on load — significant size reduction expected. All overlay types retained

@@ -41,32 +41,36 @@ ABS_SUBURB_BOUNDARY_URL = (
 )
 
 # --- VicGov ---
-# Annual — URL will change when updated, check land.vic.gov.au
+# Landing page (source of truth for new URLs): land.vic.gov.au/valuations/resources-and-reports/property-sales-statistics
+# Annual — URL will change when updated; copy new link from landing page above
 VICGOV_HOUSE_PRICE_SERIES_URL = (
-    "https://www.land.vic.gov.au/__data/assets/excel_doc/0029/709751/"
-    "Houses-by-suburb-2013-2023.xlsx"
+    "https://www.land.vic.gov.au/__data/assets/excel_doc/0032/756581/"
+    "houses-by-suburb-2014-2024.xlsx"
 )
 
-# Annual — URL will change when updated, check land.vic.gov.au
+# Annual — URL will change when updated; copy new link from landing page above
 VICGOV_UNIT_PRICE_SERIES_URL = (
     "https://www.land.vic.gov.au/__data/assets/excel_doc/0033/756582/"
     "units-by-suburb-2014-2024.xlsx"
 )
 
 # Quarterly — quarter hardcoded in URL; update manually each quarter (approx. Feb, May, Aug, Nov)
+# Copy new link from landing page above
 VICGOV_HOUSE_PRICE_QUARTERLY_URL = (
-    "https://www.land.vic.gov.au/__data/assets/excel_doc/0023/762143/"
-    "median-house-q2-2025.xls"
+    "https://www.land.vic.gov.au/__data/assets/excel_doc/0036/766719/"
+    "median-house-q3-2025.xls"
 )
 
-# Quarterly — quarter hardcoded in URL; same update cadence as house quarterly above
+# Quarterly — same update cadence as house quarterly above; copy new link from landing page above
 VICGOV_UNIT_PRICE_QUARTERLY_URL = (
-    "https://www.land.vic.gov.au/__data/assets/excel_doc/0025/762145/"
-    "median-unit-q2-2025.xls"
+    "https://www.land.vic.gov.au/__data/assets/excel_doc/0028/766720/"
+    "median-unit-q3-2025.xls"
 )
 
 # --- DFFH ---
+# Landing page (source of truth for new URLs): dffh.vic.gov.au/publications/rental-report
 # Quarterly — quarter embedded in URL slug; update manually each quarter (approx. Feb, May, Aug, Nov)
+# Copy new links from landing page above
 DFFH_RENT_BY_TYPE_URL = (
     "https://www.dffh.vic.gov.au/tables-rental-report-september-quarter-2025-excel"
 )
