@@ -71,64 +71,70 @@ with planning data.
 
 ---
 
-**VicGov Property Sales** — source of truth for all four URLs below:
+**VicGov Property Sales** — Cloudflare-protected; manual download required.
+Landing page (source of truth for all four URLs below):
 `https://www.land.vic.gov.au/valuations/resources-and-reports/property-sales-statistics`
 
 ### VicGov Median House Price — Time Series
-**Status:** ✅ GO  
+**Status:** ✅ GO (manual seed)  
 **URL:** `https://www.land.vic.gov.au/__data/assets/excel_doc/0032/756581/houses-by-suburb-2014-2024.xlsx`  
 **Format:** XLSX  
 **Granularity:** Suburb name string  
 **Update frequency:** Annual — typically mid-year; copy new URL from landing page above  
+**Manual steps:** Download from landing page. Place in `data/raw/vic-property-sales/`.  
 **Notes:** Covers 2014–2024. Primary source for price trend analysis (1y, 5y, 10y
 change). Suburb names require normalisation before joining to SAL spine.
+Cloudflare bot protection confirmed — httpx returns 403, Playwright not warranted
+for quarterly manual cadence.
 
 ---
 
 ### VicGov Median Unit Price — Time Series
-**Status:** ✅ GO  
+**Status:** ✅ GO (manual seed)  
 **URL:** `https://www.land.vic.gov.au/__data/assets/excel_doc/0033/756582/units-by-suburb-2014-2024.xlsx`  
 **Format:** XLSX  
 **Granularity:** Suburb name string  
 **Update frequency:** Annual — typically mid-year; copy new URL from landing page above  
+**Manual steps:** Download from landing page. Place in `data/raw/vic-property-sales/`.  
 **Notes:** Covers 2014–2024. Same normalisation requirement as house price series.
 
 ---
 
 ### VicGov Median House Price — Quarterly
-**Status:** ✅ GO (with caveat)  
+**Status:** ✅ GO (manual seed)  
 **URL:** `https://www.land.vic.gov.au/__data/assets/excel_doc/0036/766719/median-house-q3-2025.xls`  
 **Format:** XLS  
 **Granularity:** Suburb name string  
 **Update frequency:** Quarterly — publishes ~6 weeks after quarter end (approx. Feb, May, Aug, Nov)  
-**Caveat:** Quarter is hardcoded in the URL. Copy new URL from landing page above each quarter.  
+**Manual steps:** Copy new URL from landing page each quarter. Download and place in `data/raw/vic-property-sales/`.  
 **Notes:** Used to supplement the time series with the most recent quarter's data.
 Combined in dbt: time series provides trend, quarterly provides latest data point.
 
 ---
 
 ### VicGov Median Unit Price — Quarterly
-**Status:** ✅ GO (with caveat)  
+**Status:** ✅ GO (manual seed)  
 **URL:** `https://www.land.vic.gov.au/__data/assets/excel_doc/0028/766720/median-unit-q3-2025.xls`  
 **Format:** XLS  
 **Granularity:** Suburb name string  
 **Update frequency:** Quarterly — publishes ~6 weeks after quarter end (approx. Feb, May, Aug, Nov)  
-**Caveat:** Quarter is hardcoded in the URL. Copy new URL from landing page above each quarter.
+**Manual steps:** Copy new URL from landing page each quarter. Download and place in `data/raw/vic-property-sales/`.
 
 ---
 
 ### DFFH Median Rent — Quarterly
 **Status:** ✅ GO (with caveat)  
 **Landing page:** `https://www.dffh.vic.gov.au/publications/rental-report`  
-**URLs:**  
-- By property type: `https://www.dffh.vic.gov.au/tables-rental-report-september-quarter-2025-excel`  
-- Moving annual (all types): `https://www.dffh.vic.gov.au/moving-annual-rent-suburb-september-quarter-2025-excel`  
+**URL:** `https://www.dffh.vic.gov.au/moving-annual-rent-suburb-september-quarter-2025-excel`  
 **Format:** XLSX (redirect)  
 **Granularity:** Suburb name string  
 **Update frequency:** Quarterly — publishes ~6 weeks after quarter end (approx. Feb, May, Aug, Nov)  
-**Caveat:** Quarter is embedded in URL slug. Copy new URLs from landing page above each quarter.  
-**Notes:** Two files provide different granularity — by property type and all-types
-aggregate. Ingest both; dbt determines which feeds `suburb_metrics`.
+**Caveat:** Quarter is embedded in URL slug. Copy new URL from landing page above each quarter.  
+**Notes:** One file — moving annual rent by suburb. Contains property type breakdowns
+on separate sheets (1 bed flat, 2 bed flat, 3 bed flat, 2 bed house, 3 bed house,
+4 bed house, All properties). The companion "by property type" report (Table 12)
+adds P25/P75 percentiles but is otherwise redundant — dropped in favour of the
+moving annual file which provides the full time series.
 
 ---
 
@@ -271,8 +277,10 @@ per suburb bounding box with a small buffer.
 
 1. **Gitignore planning SHPs** — 130MB and 650MB files cannot be committed.
    Document manual download steps in README.
-2. **Quarterly URL maintenance** — VicGov and DFFH quarterly URLs have the
-   quarter hardcoded. Update `config.py` constants each quarter.
+2. **VicGov manual seed** — land.vic.gov.au is Cloudflare-protected; httpx
+   returns 403. Files must be downloaded manually from the landing page and
+   placed in `data/raw/vic-property-sales/`. Update `config.py` URL constants
+   each quarter/year as a record of what was downloaded.
 3. **Suburb name normalisation** — VicGov pricing joins on string suburb names.
    A normalisation lookup (or fuzzy match) is required in dbt staging before
    joining to the SAL spine.

@@ -4,26 +4,36 @@
 Usage:
     python -m ingestion.run <command>
 
-Commands:
-    abs-seifa       ABS SEIFA 2021 (XLSX)
-    abs-census      ABS Census 2021 GCP SAL VIC (ZIP → CSVs)
-    abs-sal-boundary    ABS SAL 2021 suburb boundary (ZIP → SHP)
-    abs             All three ABS sources above
+Individual commands:
+    abs-seifa            ABS SEIFA 2021 (XLSX)
+    abs-census           ABS Census 2021 GCP SAL VIC (ZIP → CSVs)
+    abs-sal-boundary     ABS SAL 2021 suburb boundary (ZIP → SHP)
+    dffh-rent-moving-annual  DFFH moving annual rent by suburb, by property type (XLSX)
+
+Group commands:
+    abs        All three ABS sources above
+    dffh-rent  dffh-rent-moving-annual
+
+Note: VicGov property sales is Cloudflare-protected — manual download required.
+See CLAUDE.md deployment notes for instructions.
 """
 
 import asyncio
 import sys
 
 _ABS = ["abs-seifa", "abs-census", "abs-sal-boundary"]
+_DFFH_RENT = ["dffh-rent-moving-annual"]
 
 _COMMANDS = {
     "abs-seifa": ("ingestion.abs", "fetch_seifa"),
     "abs-census": ("ingestion.abs", "fetch_census_datapack"),
     "abs-sal-boundary": ("ingestion.abs", "fetch_suburb_boundary"),
+    "dffh-rent-moving-annual": ("ingestion.dffh_rent", "fetch_rent_moving_annual"),
 }
 
 _GROUPS = {
     "abs": _ABS,
+    "dffh-rent": _DFFH_RENT,
 }
 
 

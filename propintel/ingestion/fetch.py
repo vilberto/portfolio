@@ -11,6 +11,13 @@ logger = logging.getLogger(__name__)
 _CLIENT_DEFAULTS = dict(
     timeout=httpx.Timeout(600.0),
     follow_redirects=True,
+    headers={
+        "User-Agent": (
+            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/124.0.0.0 Safari/537.36"
+        )
+    },
 )
 _CHUNK_SIZE = 8192
 

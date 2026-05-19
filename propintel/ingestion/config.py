@@ -40,42 +40,15 @@ ABS_SUBURB_BOUNDARY_URL = (
     "SAL_2021_AUST_GDA2020_SHP.zip"
 )
 
-# --- VicGov ---
-# Landing page (source of truth for new URLs): land.vic.gov.au/valuations/resources-and-reports/property-sales-statistics
-# Annual — URL will change when updated; copy new link from landing page above
-VICGOV_HOUSE_PRICE_SERIES_URL = (
-    "https://www.land.vic.gov.au/__data/assets/excel_doc/0032/756581/"
-    "houses-by-suburb-2014-2024.xlsx"
-)
-
-# Annual — URL will change when updated; copy new link from landing page above
-VICGOV_UNIT_PRICE_SERIES_URL = (
-    "https://www.land.vic.gov.au/__data/assets/excel_doc/0033/756582/"
-    "units-by-suburb-2014-2024.xlsx"
-)
-
-# Quarterly — quarter hardcoded in URL; update manually each quarter (approx. Feb, May, Aug, Nov)
-# Copy new link from landing page above
-VICGOV_HOUSE_PRICE_QUARTERLY_URL = (
-    "https://www.land.vic.gov.au/__data/assets/excel_doc/0036/766719/"
-    "median-house-q3-2025.xls"
-)
-
-# Quarterly — same update cadence as house quarterly above; copy new link from landing page above
-VICGOV_UNIT_PRICE_QUARTERLY_URL = (
-    "https://www.land.vic.gov.au/__data/assets/excel_doc/0028/766720/"
-    "median-unit-q3-2025.xls"
-)
+# --- VicGov (manual seed — Cloudflare-protected, not fetchable programmatically) ---
+# Download from landing page and place in data/raw/vic-property-sales/
+# Landing page: land.vic.gov.au/valuations/resources-and-reports/property-sales-statistics
+# Current URLs are recorded in SPIKE.md
 
 # --- DFFH ---
 # Landing page (source of truth for new URLs): dffh.vic.gov.au/publications/rental-report
 # Quarterly — quarter embedded in URL slug; update manually each quarter (approx. Feb, May, Aug, Nov)
-# Copy new links from landing page above
-DFFH_RENT_BY_TYPE_URL = (
-    "https://www.dffh.vic.gov.au/tables-rental-report-september-quarter-2025-excel"
-)
-
-# Quarterly — same update cadence as DFFH rent by type
+# Copy new link from landing page above
 DFFH_RENT_MOVING_ANNUAL_URL = (
     "https://www.dffh.vic.gov.au/moving-annual-rent-suburb-september-quarter-2025-excel"
 )

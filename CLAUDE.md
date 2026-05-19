@@ -152,14 +152,20 @@ Pydeck (Carto basemap), LangGraph
     and `data/processed/` to GCS after ingestion
   - FastAPI and dbt read from GCS/BigQuery in cloud context
 
-### Planning shapefiles
-- Download manually from Koordinates (free, requires checkout):
-  discover.data.vic.gov.au — search "Vicmap Planning scheme zone codelist"
-  and "Vicmap Planning scheme overlay codelist"
-- Select: ESRI Shapefile, Geographicals on GDA2020
-- Place in `data/raw/vicmap-planning/` before running planning ingestion
-- Upload to GCS via `ingestion.upload` in cloud deployment — no special
-  handling beyond the manual download step
+### Manual-seed sources
+These sources cannot be fetched programmatically (Cloudflare or Koordinates
+checkout required). Download manually and place files before running ingestion.
+Upload to GCS via `ingestion.upload` in cloud deployment — no special handling
+beyond the manual download step.
+
+**VicGov property sales** — Cloudflare-protected; download from landing page:
+land.vic.gov.au/valuations/resources-and-reports/property-sales-statistics
+Place files in `data/raw/vic-property-sales/`
+
+**Vicmap Planning shapefiles** — Koordinates free checkout:
+discover.data.vic.gov.au — search "Vicmap Planning scheme zone codelist"
+and "Vicmap Planning scheme overlay codelist"; select ESRI Shapefile, GDA2020
+Place files in `data/raw/vicmap-planning/` (zones ~130MB, overlays ~650MB)
 
 ### CI/CD (Session 19)
 - GitHub Actions handles test → build → deploy on push to main
