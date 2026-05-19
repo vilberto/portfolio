@@ -157,7 +157,7 @@ Pydeck (Carto basemap), LangGraph
   discover.data.vic.gov.au — search "Vicmap Planning scheme zone codelist"
   and "Vicmap Planning scheme overlay codelist"
 - Select: ESRI Shapefile, Geographicals on GDA2020
-- Place in `data/raw/planning/` before running planning ingestion
+- Place in `data/raw/vicmap-planning/` before running planning ingestion
 - Upload to GCS via `ingestion.upload` in cloud deployment — no special
   handling beyond the manual download step
 

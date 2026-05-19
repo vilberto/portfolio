@@ -7,15 +7,15 @@ RAW_DIR = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
 
 ABS_DIR = RAW_DIR / "abs"
-VICGOV_DIR = RAW_DIR / "vicgov"
-DFFH_DIR = RAW_DIR / "dffh"
-ACARA_DIR = RAW_DIR / "acara"
-VCAA_DIR = RAW_DIR / "vcaa"
-EDUCATION_DIR = RAW_DIR / "education"
-PLANNING_RAW_DIR = RAW_DIR / "planning"
+VIC_PROPERTY_SALES_DIR = RAW_DIR / "vic-property-sales"
+DFFH_RENT_DIR = RAW_DIR / "dffh-rent"
+ACARA_SCHOOL_DIR = RAW_DIR / "acara-school"
+VCAA_SSCAI_DIR = RAW_DIR / "vcaa-sscai"
+VIC_EDUCATION_DIR = RAW_DIR / "vic-education"
+VICMAP_PLANNING_RAW_DIR = RAW_DIR / "vicmap-planning"
 OSM_DIR = RAW_DIR / "osm"
 AUCTION_DIR = RAW_DIR / "auction"
-PLANNING_PROCESSED_DIR = PROCESSED_DIR / "planning"
+VICMAP_PLANNING_PROCESSED_DIR = PROCESSED_DIR / "vicmap-planning"
 
 # --- ABS ---
 # Stable URL — updates every 5 years aligned to Census cycle
@@ -121,10 +121,10 @@ SCHOOL_ZONES_URL = (
     "dv419_DataVic_School_Zones_2027_MAR26.zip"
 )
 
-# --- Planning (manual seed) ---
+# --- Vicmap Planning (manual seed) ---
 # ~130MB zones and ~650MB overlays — gitignored, never commit
 # Download via Koordinates free checkout at discover.data.vic.gov.au
-# Place SHP files in data/raw/planning/ before running planning ingestion
+# Place SHP files in data/raw/vicmap-planning/ before running planning ingestion
 # Cadence: irregular — re-fetch when scheme amendments warrant it
 
 # --- OSM Overpass ---
