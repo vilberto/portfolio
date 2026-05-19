@@ -1,5 +1,6 @@
 # Data files — repopulate via ingestion pipeline
-data/**/*
+data/**
+!data/**/
 !data/**/.gitkeep
 
 # Python
