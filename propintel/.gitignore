@@ -1,0 +1,14 @@
+# Data files — repopulate via ingestion pipeline
+data/**/*
+!data/**/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+build/
+
+# Environment
+.env
