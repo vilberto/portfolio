@@ -245,8 +245,14 @@ EPO (Contamination), PAO (Public Acquisition), DDO (Design and Development).
 **Notes:** Confirmed accessible via headless Playwright from residential IP.
 Same Akamai bot protection as Domain listing search — blocked on GitHub Actions
 IP ranges (confirmed in PropWatch spike, Session 3/5). Pipeline must run from
-a residential IP or a proxy that presents as one. Data is in the HTML — no
-secondary API call required. Parser built in Session 7.
+a residential IP or a proxy that presents as one.
+Data is embedded as JSON in a `<script id="__NEXT_DATA__">` tag — extracted via
+Playwright `evaluate()`, no HTML parsing library required.
+`ingestion/auction.py` implements `fetch_auction_results()` (single week) and
+`fetch_auction_backfill()` (up to 1 year back, idempotent, 10-consecutive-miss
+stopping condition to handle holiday gaps).
+Known source data quirk: Domain publishes occasional duplicate `domain_id` entries
+within a single week's page (identical rows). dbt deduplication handles this.
 
 ---
 

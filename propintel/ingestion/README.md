@@ -21,8 +21,12 @@ Individual sources:
 | `vcaa-sscai` | VCAA SSCAI all years (XLSX × n, idempotent per year) |
 | `vic-education-zones` | Victorian school zone boundaries (ZIP → GeoJSON) |
 | `vic-education-locations` | DataVic school locations crosscheck (CSV) |
+| `auction` | Domain Melbourne auction results — latest week (CSV + JSON) |
+| `auction-backfill` | Domain Melbourne auction results — up to 1 year back |
 
 Group shortcuts: `abs`, `dffh-rent`, `acara-school`, `vic-education`, `all`
+
+`auction` and `auction-backfill` are intentionally excluded from `all` — they require a residential IP (Akamai blocks cloud IPs) and Playwright. One-time browser setup: `playwright install chromium`.
 
 **Manual-seed sources** (Cloudflare or Koordinates checkout — no programmatic fetch):
 
@@ -111,3 +115,26 @@ Group shortcuts: `abs`, `dffh-rent`, `acara-school`, `vic-education`, `all`
 2. Search "Vicmap Planning scheme zone codelist" and "Vicmap Planning scheme overlay codelist"
 3. Select ESRI Shapefile, GDA2020; add to cart and check out (free)
 4. Place SHP files in `data/raw/vicmap-planning/`
+
+---
+
+### Auction — Domain results
+**Cadence:** Weekly (Saturday night onwards; results updated through Sunday/Monday).
+
+**First-time setup** (once per machine after `pip install -e .`):
+```bash
+playwright install chromium
+```
+
+**Weekly run:**
+```bash
+python -m ingestion.run auction
+```
+Re-run as many times as needed through the weekend — each run writes a new timestamped file. dbt deduplicates by `(domain_id, week_ending)` keeping the latest `scraped_at`.
+
+**First run / backfill** (fetches up to 1 year back, skips already-downloaded weeks):
+```bash
+python -m ingestion.run auction-backfill
+```
+
+**Requires residential IP.** Akamai blocks cloud and GitHub Actions IPs. Run locally or via residential proxy.

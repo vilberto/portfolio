@@ -57,12 +57,13 @@ Users select a suburb watchlist via Streamlit multiselect on page 2. Weekly emai
 digest shows Melbourne-wide clearance rate, combined watchlist rate, and per-suburb
 breakdown.
  
-Auction data ingestion is manual: user downloads the HTML from Domain and places it
-in `data/raw/auction_results/`. Prefect detects the new file and triggers the
-downstream pipeline (parse → dbt → email). This design deliberately separates the
-trigger from the ingestion source — if automated fetching becomes viable in future,
-a separate process can drop the HTML into the same directory without touching the
-pipeline.
+Auction data ingestion uses a headless Playwright scraper (`ingestion/auction.py`)
+that hits `domain.com.au/auction-results/melbourne/`. Each run writes a timestamped
+CSV to `data/raw/auction/` — re-running through the weekend accumulates multiple
+scrapes as results are updated. dbt deduplicates by `(domain_id, week_ending)`.
+Requires residential IP (Akamai blocks cloud IPs). Domain publishes duplicate
+`domain_id` entries within a single week's results page — expected source data
+quirk, handled by dbt deduplication.
  
 ### Key design goals
  
@@ -117,7 +118,7 @@ needed.
 | VCAA SSCAI | Senior secondary school results | CSV | Annual |
 | data.vic.gov.au | School catchment boundaries (primary + secondary) | GeoJSON | Annual |
 | data.vic.gov.au | Planning zones, overlays, permits | GeoJSON / CSV | Varies |
-| Domain (manual) | Auction results HTML — user downloads and places in `data/raw/auction_results/` | HTML | Weekly |
+| Domain (Playwright) | Auction results — headless scraper, residential IP required | CSV | Weekly |
 | PTV GTFS | Public transport stops and routes | GTFS (zip) | Periodic |
 | OpenStreetMap | Points of interest (Overpass API) | GeoJSON | On demand |
 | REIV | Days on market | TBC — spike required | Weekly |
