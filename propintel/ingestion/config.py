@@ -73,23 +73,27 @@ DATAVIC_SCHOOL_LOCATIONS_URL = (
 )
 
 # --- VCAA SSCAI ---
-# Annual — new URL each year after school year end (Dec/Jan); confirm schema across years before union
-VCAA_SSCAI_2025_URL = (
-    "https://www.vcaa.vic.edu.au/sites/default/files/2025-12/"
-    "2025-SeniorSecondaryCompletionandAchievementInformation.xlsx"
-)
-VCAA_SSCAI_2024_URL = (
-    "https://www.vcaa.vic.edu.au/sites/default/files/Documents/statistics/2024/"
-    "2024SeniorSecondaryCompletionAndAchievementInformation.xlsx"
-)
-VCAA_SSCAI_2023_URL = (
-    "https://www.vcaa.vic.edu.au/sites/default/files/Documents/statistics/2023/"
-    "2023SeniorSecondaryCompletionAndAchievementInformation.xlsx"
-)
-VCAA_SSCAI_2022_URL = (
-    "https://www.vcaa.vic.edu.au/sites/default/files/Documents/statistics/2022/"
-    "2022SeniorSecondaryCompletionAndAchievementInformation.xlsx"
-)
+# Annual — new URL each year after school year end (Dec/Jan).
+# To add a new year: append an entry here. No code changes required.
+# Confirm schema consistency across years before building the dbt union model.
+VCAA_SSCAI_URLS: dict[int, str] = {
+    2022: (
+        "https://www.vcaa.vic.edu.au/sites/default/files/Documents/statistics/2022/"
+        "2022SeniorSecondaryCompletionAndAchievementInformation.xlsx"
+    ),
+    2023: (
+        "https://www.vcaa.vic.edu.au/sites/default/files/Documents/statistics/2023/"
+        "2023SeniorSecondaryCompletionAndAchievementInformation.xlsx"
+    ),
+    2024: (
+        "https://www.vcaa.vic.edu.au/sites/default/files/Documents/statistics/2024/"
+        "2024SeniorSecondaryCompletionAndAchievementInformation.xlsx"
+    ),
+    2025: (
+        "https://www.vcaa.vic.edu.au/sites/default/files/2025-12/"
+        "2025-SeniorSecondaryCompletionandAchievementInformation.xlsx"
+    ),
+}
 
 # --- School Zones ---
 # Annual — URL will change when new year zones publish (Oct/Nov prior year)

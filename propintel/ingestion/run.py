@@ -5,17 +5,26 @@ Usage:
     python -m ingestion.run <command>
 
 Individual commands:
-    abs-seifa            ABS SEIFA 2021 (XLSX)
-    abs-census           ABS Census 2021 GCP SAL VIC (ZIP → CSVs)
-    abs-sal-boundary     ABS SAL 2021 suburb boundary (ZIP → SHP)
+    abs-seifa                ABS SEIFA SAL (XLSX)
+    abs-census               ABS Census GCP SAL VIC (ZIP → CSVs)
+    abs-sal-boundary         ABS SAL suburb boundary (ZIP → SHP)
     dffh-rent-moving-annual  DFFH moving annual rent by suburb, by property type (XLSX)
+    acara-school-profile     ACARA school profile longitudinal dataset (XLSX)
+    acara-school-location    ACARA school locations with lat/lng (XLSX)
+    vcaa-sscai               VCAA SSCAI all years (XLSX × n, idempotent per year)
+    vic-education-zones      Victorian school zone boundaries (ZIP → SHP)
+    vic-education-locations  DataVic school locations crosscheck (CSV)
 
 Group commands:
-    abs        All three ABS sources above
-    dffh-rent  dffh-rent-moving-annual
+    abs           abs-seifa, abs-census, abs-sal-boundary
+    dffh-rent     dffh-rent-moving-annual
+    acara-school  acara-school-profile, acara-school-location
+    vic-education vic-education-zones, vic-education-locations
+    all           abs, dffh-rent, acara-school, vcaa-sscai, vic-education
 
 Note: VicGov property sales is Cloudflare-protected — manual download required.
 See CLAUDE.md deployment notes for instructions.
+Note: vicmap-planning, osm, and auction are handled separately.
 """
 
 import asyncio
@@ -23,17 +32,27 @@ import sys
 
 _ABS = ["abs-seifa", "abs-census", "abs-sal-boundary"]
 _DFFH_RENT = ["dffh-rent-moving-annual"]
+_ACARA_SCHOOL = ["acara-school-profile", "acara-school-location"]
+_VIC_EDUCATION = ["vic-education-zones", "vic-education-locations"]
 
 _COMMANDS = {
     "abs-seifa": ("ingestion.abs", "fetch_seifa"),
     "abs-census": ("ingestion.abs", "fetch_census_datapack"),
     "abs-sal-boundary": ("ingestion.abs", "fetch_suburb_boundary"),
     "dffh-rent-moving-annual": ("ingestion.dffh_rent", "fetch_rent_moving_annual"),
+    "acara-school-profile": ("ingestion.acara_school", "fetch_school_profile"),
+    "acara-school-location": ("ingestion.acara_school", "fetch_school_location"),
+    "vcaa-sscai": ("ingestion.vcaa_sscai", "fetch_sscai"),
+    "vic-education-zones": ("ingestion.vic_education", "fetch_school_zones"),
+    "vic-education-locations": ("ingestion.vic_education", "fetch_school_locations"),
 }
 
 _GROUPS = {
     "abs": _ABS,
     "dffh-rent": _DFFH_RENT,
+    "acara-school": _ACARA_SCHOOL,
+    "vic-education": _VIC_EDUCATION,
+    "all": _ABS + _DFFH_RENT + _ACARA_SCHOOL + ["vcaa-sscai"] + _VIC_EDUCATION,
 }
 
 

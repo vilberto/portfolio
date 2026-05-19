@@ -20,7 +20,7 @@ from ingestion.config import ABS_DIR
 
 
 def test_seifa_file_exists_and_loads():
-    path = ABS_DIR / "seifa_2021_sal.xlsx"
+    path = ABS_DIR / "seifa_sal.xlsx"
     if not path.exists():
         pytest.skip("SEIFA not downloaded — run: python -m ingestion.run abs-seifa")
 
