@@ -13,7 +13,6 @@ ACARA_SCHOOL_DIR = RAW_DIR / "acara-school"
 VCAA_SSCAI_DIR = RAW_DIR / "vcaa-sscai"
 VIC_EDUCATION_DIR = RAW_DIR / "vic-education"
 VICMAP_PLANNING_RAW_DIR = RAW_DIR / "vicmap-planning"
-OSM_DIR = RAW_DIR / "osm"
 AUCTION_DIR = RAW_DIR / "auction"
 AUCTION_URL = "https://www.domain.com.au/auction-results/melbourne/"
 
@@ -109,10 +108,6 @@ SCHOOL_ZONES_URL = (
 # Download via Koordinates free checkout at discover.data.vic.gov.au
 # Place SHP files in data/raw/vicmap-planning/ before running planning ingestion
 # Cadence: irregular — re-fetch when scheme amendments warrant it
-
-# --- OSM Overpass ---
-# Query at pipeline run time — no caching needed for annual refresh
-OVERPASS_API_URL = "https://overpass-api.de/api/interpreter"
 
 # --- Greater Melbourne LGAs ---
 # Used to filter planning data to Greater Melbourne metro area.

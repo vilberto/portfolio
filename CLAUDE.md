@@ -120,7 +120,6 @@ needed.
 | data.vic.gov.au | Planning zones, overlays, permits | GeoJSON / CSV | Varies |
 | Domain (Playwright) | Auction results — headless scraper, residential IP required | CSV | Weekly |
 | PTV GTFS | Public transport stops and routes | GTFS (zip) | Periodic |
-| OpenStreetMap | Points of interest (Overpass API) | GeoJSON | On demand |
 | REIV | Days on market | TBC — spike required | Weekly |
  
 Note: NAPLAN results are not in scope — data not easily accessible without scraping.
@@ -136,7 +135,7 @@ Senior secondary performance uses VCAA SSCAI data only.
 ### Stack
  
 ABS open data, VicGov / DFFH open data, ACARA, VCAA, data.vic.gov.au, OSM
-(Nominatim + Overpass API), PTV GTFS, GeoPandas, dbt, DuckDB, Prefect, FastAPI,
+(Nominatim), PTV GTFS, GeoPandas, dbt, DuckDB, Prefect, FastAPI,
 ChromaDB, Ollama (embeddings), Claude API (generation + web search), Streamlit,
 Pydeck (Carto basemap), LangGraph
 

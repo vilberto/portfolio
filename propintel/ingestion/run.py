@@ -26,7 +26,7 @@ Group commands:
 
 Note: VicGov property sales is Cloudflare-protected — manual download required.
 See CLAUDE.md deployment notes for instructions.
-Note: vicmap-planning and osm are handled separately.
+Note: vicmap-planning is a manual Koordinates checkout — not run via run.py.
 Note: auction and auction-backfill require residential IP (Akamai blocks cloud IPs).
       First-time setup: playwright install chromium
 """

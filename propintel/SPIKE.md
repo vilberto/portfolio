@@ -256,16 +256,18 @@ within a single week's page (identical rows). dbt deduplication handles this.
 
 ---
 
-### OSM Overpass API — Transit Stops + POI Counts
+### PTV GTFS — Transit Stops
 **Status:** ✅ GO  
-**Endpoint:** `https://overpass-api.de/api/interpreter`  
-**Format:** JSON  
-**Update frequency:** Continuous — query at pipeline run time, no caching needed for annual refresh  
-**Notes:** Replaces PTV GTFS (300MB) for transit scoring. Provides stop locations
-and mode type (tram, train, bus) per suburb polygon. Stop density + mode diversity
-is sufficient signal for `transit_score` in `suburb_metrics`. POI counts
-(cafes, supermarkets, parks, schools) also sourced here. Queries constructed
-per suburb bounding box with a small buffer.
+**URL:** `https://transitfeeds.com/p/ptv/497/latest/download` or direct from `https://www.ptv.vic.gov.au/footer/data-and-reporting/datasets/gtfs/`  
+**Format:** ZIP (GTFS — stops.txt, routes.txt, trips.txt, stop_times.txt)  
+**Update frequency:** Periodic — PTV publishes updates irregularly; re-fetch when data is stale  
+**Files of interest:** `stops.txt` (stop lat/lng, name), `routes.txt` (route type: tram=0, train=2, bus=3)  
+**Notes:** OSM Overpass was trialled first but dropped — public instances returned 406/504
+too frequently to be reliable for a scheduled pipeline. PTV GTFS gives authoritative
+stop locations and mode types directly from the operator. Stop density + mode diversity
+is sufficient signal for `transit_score` in `suburb_metrics`. Spatial join to SAL
+boundaries done in GeoPandas at ingestion time; results written to
+`data/processed/ptv/transit.json` (same schema as the OSM approach).
 
 ---
 
@@ -273,7 +275,7 @@ per suburb bounding box with a small buffer.
 
 | Source | Reason |
 |---|---|
-| PTV GTFS | 300MB for schedule data; OSM provides sufficient stop density + mode type signal for v1 |
+| OSM Overpass API | Public instances (overpass-api.de, kumi, private.coffee) return 406/504 too frequently under load — unreliable for a scheduled pipeline. PTV GTFS used instead for transit data. |
 | REIV days on market | Likely behind authentication; not spiked — drop for v1, revisit if needed |
 | ABS Data Explorer API (SDMX) | Complex format; direct file download is simpler and equivalent for infrequently updated data |
 
