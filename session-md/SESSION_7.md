@@ -37,14 +37,14 @@ Manual seeds (not automated):
 Ingestion helper modules:
 - ingestion/fetch.py — download_file(), download_and_extract()
 - ingestion/config.py — all URLs and path constants
-- ingestion/convert.py — does not exist yet, built in this session
+- ingestion/convert.py — built this session (see Part A)
 - ingestion/run.py — CLI entry point
 
 ## Session 7 scope
 
-### Part A — MVP format conversion
+### Part A — MVP format conversion ✓ COMPLETE
 
-Convert only the three sources needed for the MVP map.
+Convert only the sources needed for the MVP map.
 Each conversion is a standalone function in ingestion/convert.py.
 
 Convention:
@@ -53,20 +53,18 @@ Convention:
 
 | Source | Conversion | Output |
 |---|---|---|
-| data/raw/abs/boundary/*.shp | SHP → GeoParquet | data/processed/abs/boundary.parquet |
-| data/raw/abs/census/Metadata/2021Census_geog_desc_1st_2nd_3rd_release.xlsx (sheet: 2021_ASGS_Non_ABS_Structures) | XLSX → Parquet | data/processed/abs/sal_lookup.parquet |
-| data/raw/vic-property-sales/median-house-q3-2025.xls | XLS → Parquet | data/processed/vic-property-sales/median_house_quarterly_latest.parquet |
-| data/raw/vic-education/*.geojson (7 files: primary + yr7–yr12) | GeoJSON → GeoParquet (one per file) | data/processed/vic-education/school_zones_{type}.parquet |
+| data/raw/abs/boundary/*.shp | SHP → GeoParquet | data/processed/abs/sal_boundary.parquet |
+| data/raw/abs/census/Metadata/2021Census_geog_desc_1st_2nd_3rd_release.xlsx (sheet: 2021_ASGS_Non_ABS_Structures) | XLSX → Parquet (filter ASGS_Structure = 'SAL') | data/processed/abs/sal_lookup.parquet |
+| data/raw/vic-property-sales/median-house-q3-2025.xls | XLS → Parquet (skiprows=5, named columns) | data/processed/vic-property-sales/median_house_quarterly_latest.parquet |
+| data/raw/vic-education/*Integrated*.geojson (7 files) | GeoJSON → GeoParquet (one per file) | data/processed/vic-education/school_zones_{type}.parquet |
 
-For all SHP conversions:
-- Read with GeoPandas
-- Reproject to WGS84 (EPSG:4326) if not already
-- Save as GeoParquet
+Note: only *Integrated*.geojson files converted — Standalone files (juniorsec, seniorsec,
+singlesex) excluded from MVP.
 
-For XLSX conversion:
-- Read with pandas
-- Save as Parquet (snappy compression)
-- Preserve all columns — no filtering, no transformation
+House price parquet columns:
+suburb_name, price_jul_sep_2024, price_oct_dec_2024, price_jan_mar_2025,
+price_apr_jun_2025, price_jul_sep_2025, no_of_sales_jul_sep_2025,
+no_of_sales_2025, change_pct_1y, change_pct_qoq
 
 run.py additions:
 - convert-abs-boundary
@@ -75,82 +73,60 @@ run.py additions:
 - convert-school-zones
 - convert-mvp — runs all four in sequence
 
-Smoke test each conversion: confirm file exists, size > 0,
-loads back into expected structure with geometry/columns intact.
+Smoke tests in tests/ingestion/test_convert.py — all pass.
 
-### Part B — dbt setup + MVP models
-
-Set up dbt project targeting DuckDB. Install dbt-core and dbt-duckdb.
-
-profiles.yml:
-- Target: propintel/propintel.duckdb
-- DuckDB spatial extension must be installed and loaded:
-  INSTALL spatial; LOAD spatial;
-  Configure via dbt profile extensions or on-run-start hook.
+### Part B — dbt setup + MVP models ✓ COMPLETE
 
 dbt project structure:
 ```
 propintel/dbt/
+├── .gitignore          (target/, logs/, .user.yml)
 ├── dbt_project.yml
-├── profiles.yml
-├── models/
-│   ├── staging/
-│   │   ├── stg_suburb_boundary.sql
-│   │   ├── stg_house_price.sql
-│   │   └── stg_school_zones.sql
-│   └── marts/
-│       ├── suburb_metrics.sql
-│       └── school_zones_mart.sql
-└── sources.yml
+├── profiles.yml        (path: ../propintel.duckdb)
+└── models/
+    ├── sources.yml     (external_location for all parquet sources)
+    ├── staging/
+    │   ├── stg_suburb_boundary.sql
+    │   ├── stg_house_price.sql
+    │   └── stg_school_zones.sql
+    └── marts/
+        ├── suburb_metrics.sql
+        └── school_zones_mart.sql
 ```
 
-Sources declared in sources.yml:
-- data/processed/abs/boundary.parquet → source suburb_boundary
-- data/processed/abs/sal_lookup.parquet → source sal_lookup
-- data/processed/vic-property-sales/median_house_quarterly_latest.parquet → source house_price
-- data/processed/vic-education/school_zones_{type}.parquet → source school_zones (one source per file)
-
-Staging models — clean and type-cast only, no business logic:
+All parquet sources use meta.external_location in sources.yml (required by dbt-duckdb).
+Spatial extension loaded via on-run-start hooks (two separate entries).
 
 stg_suburb_boundary:
 - sal_code (SAL_CODE21)
-- sal_name (SAL_NAME21)
+- sal_name — trim(regexp_replace(SAL_NAME21, '\s*\(Vic\.\)\s*$', ''))
 - state_code (STE_CODE21)
 - geometry
-- Filter to Victoria only (STE_CODE21 = '2')
+- Filter: STE_CODE21 = '2' (VIC only)
 
 stg_house_price:
-- suburb_name (raw string — basic normalisation: lowercase, strip whitespace)
-- year
-- median_price
-- Keep Melbourne suburbs only
+- suburb_name (lowercased, trimmed)
+- price_jul_sep_2025
+- change_pct_1y
 
 stg_school_zones:
-- school_name
-- zone_type (primary/secondary)
-- year_level (for secondary zones — split by year level)
+- school_name, campus_name, entity_code
+- zone_level — single column, values: primary | Y7 | Y8 | Y9 | Y10 | Y11 | Y12
 - geometry
+- Union of all 7 Integrated sources
 
-Core mart models:
-
-suburb_metrics (MVP — first pass):
-- sal_code
-- sal_name
-- geometry
-- latest_median_house_price (Sep 2025)
-- house_price_1y_change (%)
-Join stg_suburb_boundary to stg_house_price on normalised suburb name.
-Basic normalisation only: lowercase + strip whitespace.
-Unmatched suburbs get null price — acceptable for MVP.
+suburb_metrics:
+- sal_code, sal_name, geometry
+- latest_median_house_price (Sep 2025) — price_jul_sep_2025
+- house_price_1y_change — change_pct_1y
+- Join on lower(trim(sal_name)) = suburb_name; 95% match rate (724/762 price entries)
 
 school_zones_mart:
-- school_name
-- zone_type
-- year_level
-- geometry
-Thin wrapper over stg_school_zones — no joins needed for MVP.
+- school_name, campus_name, entity_code, zone_level, geometry
 
-Run dbt build and confirm both marts populated.
+dbt build: PASS=7, all models green. propintel.duckdb created at propintel/propintel.duckdb.
+Note: *.duckdb gitignored — rebuild with dbt build from propintel/dbt/.
+Note: rebuilding a staging model requires dbt build --select +<downstream_mart> not just --select <mart>.
 
 ### Part C — FastAPI + Pydeck
 
@@ -167,7 +143,7 @@ GET /suburbs
 
 GET /school-zones
 - Returns GeoJSON FeatureCollection
-- Each feature: school_name, zone_type, year_level
+- Each feature: school_name, zone_level
 - Source: school_zones_mart
 
 Run FastAPI with uvicorn. Confirm both endpoints return valid GeoJSON.
@@ -178,8 +154,8 @@ Pydeck map (propintel/frontend/map.py or map.html):
   latest_median_house_price (choropleth)
   Hover tooltip: suburb name + median price + 1y change
 - Layer 2 — PolygonLayer: school zones (outline only, no fill)
-  Toggle: primary zones / secondary zones / off
-  Hover tooltip: school name + zone type
+  Toggle: Primary / Y7 / Y8 / Y9 / Y10 / Y11 / Y12 / off (filter by zone_level)
+  Hover tooltip: school name + zone_level
 
 ## Key files to read at session start
 
@@ -190,6 +166,7 @@ Pydeck map (propintel/frontend/map.py or map.html):
 
 ## Stack additions this session
 
+- pyarrow (GeoParquet read/write)
 - dbt-core
 - dbt-duckdb
 - DuckDB (with spatial extension)
