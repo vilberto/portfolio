@@ -1,0 +1,8 @@
+propintel:
+  outputs:
+    dev:
+      type: duckdb
+      path: "../propintel.duckdb"
+      extensions:
+        - spatial
+  target: dev

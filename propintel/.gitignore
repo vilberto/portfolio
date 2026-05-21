@@ -11,5 +11,9 @@ __pycache__/
 dist/
 build/
 
+# DuckDB — derived artifact, rebuilt via dbt build
+*.duckdb
+*.duckdb.wal
+
 # Environment
 .env

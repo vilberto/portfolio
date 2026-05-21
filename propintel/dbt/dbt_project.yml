@@ -1,0 +1,21 @@
+name: propintel
+version: "1.0.0"
+config-version: 2
+
+profile: propintel
+
+model-paths: ["models"]
+
+target-path: "target"
+clean-targets: ["target", "dbt_packages"]
+
+on-run-start:
+  - "INSTALL spatial"
+  - "LOAD spatial"
+
+models:
+  propintel:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table

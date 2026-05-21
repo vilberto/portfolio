@@ -1,0 +1,45 @@
+version: 2
+
+sources:
+  - name: propintel
+    schema: main
+    tables:
+      - name: sal_boundary
+        meta:
+          external_location: "read_parquet('../data/processed/abs/sal_boundary.parquet')"
+
+      - name: sal_lookup
+        meta:
+          external_location: "read_parquet('../data/processed/abs/sal_lookup.parquet')"
+
+      - name: house_price
+        meta:
+          external_location: "read_parquet('../data/processed/vic-property-sales/median_house_quarterly_latest.parquet')"
+
+      - name: school_zones_primary_integrated
+        meta:
+          external_location: "read_parquet('../data/processed/vic-education/school_zones_primary_integrated.parquet')"
+
+      - name: school_zones_secondary_integrated_year7
+        meta:
+          external_location: "read_parquet('../data/processed/vic-education/school_zones_secondary_integrated_year7.parquet')"
+
+      - name: school_zones_secondary_integrated_year8
+        meta:
+          external_location: "read_parquet('../data/processed/vic-education/school_zones_secondary_integrated_year8.parquet')"
+
+      - name: school_zones_secondary_integrated_year9
+        meta:
+          external_location: "read_parquet('../data/processed/vic-education/school_zones_secondary_integrated_year9.parquet')"
+
+      - name: school_zones_secondary_integrated_year10
+        meta:
+          external_location: "read_parquet('../data/processed/vic-education/school_zones_secondary_integrated_year10.parquet')"
+
+      - name: school_zones_secondary_integrated_year11
+        meta:
+          external_location: "read_parquet('../data/processed/vic-education/school_zones_secondary_integrated_year11.parquet')"
+
+      - name: school_zones_secondary_integrated_year12
+        meta:
+          external_location: "read_parquet('../data/processed/vic-education/school_zones_secondary_integrated_year12.parquet')"
