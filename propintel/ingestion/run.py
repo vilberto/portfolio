@@ -33,6 +33,7 @@ Note: auction and auction-backfill require residential IP (Akamai blocks cloud I
 """
 
 import asyncio
+import inspect
 import logging
 import sys
 
@@ -60,13 +61,25 @@ _COMMANDS = {
     "ptv-gtfs": ("ingestion.ptv_gtfs", "fetch_gtfs_raw"),
     "auction": ("ingestion.auction", "fetch_auction_results"),
     "auction-backfill": ("ingestion.auction", "fetch_auction_backfill"),
+    "convert-abs-boundary": ("ingestion.convert", "convert_abs_boundary"),
+    "convert-sal-lookup": ("ingestion.convert", "convert_sal_lookup"),
+    "convert-house-price": ("ingestion.convert", "convert_house_price"),
+    "convert-school-zones": ("ingestion.convert", "convert_school_zones"),
 }
+
+_CONVERT_MVP = [
+    "convert-abs-boundary",
+    "convert-sal-lookup",
+    "convert-house-price",
+    "convert-school-zones",
+]
 
 _GROUPS = {
     "abs": _ABS,
     "dffh-rent": _DFFH_RENT,
     "acara-school": _ACARA_SCHOOL,
     "vic-education": _VIC_EDUCATION,
+    "convert-mvp": _CONVERT_MVP,
     "all": _ABS
     + _DFFH_RENT
     + _ACARA_SCHOOL
@@ -88,7 +101,10 @@ async def _run(command: str) -> None:
         module = __import__(module_name, fromlist=[func_name])
         func = getattr(module, func_name)
         print(f"[{target}] starting...")
-        result = await func()
+        if inspect.iscoroutinefunction(func):
+            result = await func()
+        else:
+            result = await asyncio.to_thread(func)
         print(f"[{target}] done → {result}")
 
 

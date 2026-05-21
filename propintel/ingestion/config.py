@@ -24,6 +24,9 @@ PTV_GTFS_URL = (
 AUCTION_URL = "https://www.domain.com.au/auction-results/melbourne/"
 
 VICMAP_PLANNING_PROCESSED_DIR = PROCESSED_DIR / "vicmap-planning"
+PROCESSED_ABS_DIR = PROCESSED_DIR / "abs"
+PROCESSED_VIC_PROPERTY_SALES_DIR = PROCESSED_DIR / "vic-property-sales"
+PROCESSED_VIC_EDUCATION_DIR = PROCESSED_DIR / "vic-education"
 
 # --- ABS ---
 # Stable URL — updates every 5 years aligned to Census cycle

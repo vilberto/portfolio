@@ -12,7 +12,14 @@ dependencies = [
     "openpyxl>=3.1",
     "xlrd>=2.0",
     "geopandas>=0.14",
+    "pyarrow>=16",
     "playwright>=1.40",
+    "dbt-core>=1.8",
+    "dbt-duckdb>=1.8",
+    "duckdb>=1.1",
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "pydeck>=0.9",
 ]
 
 [project.optional-dependencies]
