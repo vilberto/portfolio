@@ -112,7 +112,7 @@ needed.
 | ABS Census 2021 | Median income, age, household size, family%, dwelling type (SA2) | CSV | Census cycle |
 | ABS SEIFA | Advantage/disadvantage indexes (SA2) | CSV | Census cycle |
 | ABS ASGS | Suburb boundaries | GeoJSON | Infrequent |
-| VicGov / DFFH | Median house price quarterly + time series | CSV | Quarterly |
+| VicGov / DFFH | Median house price quarterly + time series | XLS | Quarterly |
 | VicGov / DFFH | Rental price | CSV | Quarterly |
 | ACARA | School enrolment, student-teacher ratio, ICSEA | CSV | Annual |
 | VCAA SSCAI | Senior secondary school results | CSV | Annual |
@@ -141,11 +141,28 @@ Pydeck (Carto basemap), LangGraph
 
 ---
 
+## Session plan changes (as of Session 6)
+
+Fast-track MVP decision taken after Session 6. Session order adjusted:
+- Session 7: MVP fast track — working Pydeck map with house price 
+  choropleth + school zone toggle. See SESSION_7.md in scratch/.
+- Session 8: Remaining format conversion + full dbt/DuckDB coverage. 
+  See SESSION_8.md in scratch/.
+- Session 9: Remaining FastAPI + Pydeck layers + spatial intersection work.
+- Session 10: Auction digest email.
+- Sessions 11+: Continue as per upskill plan.
+
+---
+
 ## Deployment notes
 
 ### Data layer
 - Local development: ingestion pipeline writes to `data/raw/` and
   `data/processed/`. Both directories are gitignored.
+- data/raw/ — downloaded source files as-is
+- data/processed/ — format-converted files ready for DuckDB 
+  (Parquet, GeoParquet). CSVs are DuckDB-readable natively so 
+  they stay in data/raw/.
 - Cloud target (Session 19): GCS replaces the local file system.
   - `ingestion.run` stays unchanged — fetches from source to `data/raw/` locally
   - A separate `ingestion.upload` step (not yet built) pushes `data/raw/`
