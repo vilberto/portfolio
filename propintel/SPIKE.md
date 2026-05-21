@@ -258,16 +258,23 @@ within a single week's page (identical rows). dbt deduplication handles this.
 
 ### PTV GTFS — Transit Stops
 **Status:** ✅ GO  
-**URL:** `https://transitfeeds.com/p/ptv/497/latest/download` or direct from `https://www.ptv.vic.gov.au/footer/data-and-reporting/datasets/gtfs/`  
-**Format:** ZIP (GTFS — stops.txt, routes.txt, trips.txt, stop_times.txt)  
+**URL:** `https://opendata.transport.vic.gov.au/dataset/3f4e292e-7f8a-4ffe-831f-1953be0fe448/resource/fb152201-859f-4882-9206-b768060b50ad/download/gtfs.zip`  
+**Format:** ZIP (~240MB) containing mode-separated folders; each mode folder contains its own ZIP  
 **Update frequency:** Periodic — PTV publishes updates irregularly; re-fetch when data is stale  
-**Files of interest:** `stops.txt` (stop lat/lng, name), `routes.txt` (route type: tram=0, train=2, bus=3)  
+**Licence:** Creative Commons Attribution 4.0  
+**Folders used** (each contains a ZIP with GTFS text files inside):
+- `2/` — Metropolitan Train: stops.txt, routes.txt, trips.txt, stop_times.txt
+- `3/` — Metropolitan Tram: stops.txt, routes.txt, trips.txt, stop_times.txt
+- `4/` — Myki Bus (Metro Bus): stops.txt, routes.txt, trips.txt, stop_times.txt  
+
 **Notes:** OSM Overpass was trialled first but dropped — public instances returned 406/504
 too frequently to be reliable for a scheduled pipeline. PTV GTFS gives authoritative
 stop locations and mode types directly from the operator. Stop density + mode diversity
-is sufficient signal for `transit_score` in `suburb_metrics`. Spatial join to SAL
-boundaries done in GeoPandas at ingestion time; results written to
-`data/processed/ptv/transit.json` (same schema as the OSM approach).
+is sufficient signal for `transit_score` in `suburb_metrics`. Download once, extract
+only folders 2, 3, 4 and their inner ZIPs — extracted files are a fraction of the
+240MB outer ZIP. Gitignore the ZIPs. Spatial join to SAL boundaries done in GeoPandas
+at ingestion time; results written to `data/processed/ptv/transit.json` (same schema
+as the OSM approach).
 
 ---
 
