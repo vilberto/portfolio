@@ -283,8 +283,11 @@ folder 1 would silently drop those stations from the transit score. PTV GTFS giv
 authoritative stop locations and mode types directly from the operator. Stop density +
 mode diversity is sufficient signal for `transit_score` in `suburb_metrics`. Download
 once, extract only folders 1, 2, 3, 4 and their inner ZIPs — extracted files are a
-fraction of the 240MB outer ZIP. Gitignore the ZIPs. Spatial join to SAL boundaries
-done in GeoPandas at ingestion time; results written to `data/processed/ptv/transit.json`.
+fraction of the 240MB outer ZIP. Gitignore the ZIPs.  
+**Deferred:** Spatial join to SAL boundaries, station network classification
+(metro / regional / both), and per-suburb stop aggregation are all deferred to the
+dbt layer (Session 7). Ingestion writes raw GTFS text files only — no processed
+output from this module.
 
 ---
 

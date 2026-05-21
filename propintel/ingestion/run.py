@@ -14,6 +14,7 @@ Individual commands:
     vcaa-sscai               VCAA SSCAI all years (XLSX × n, idempotent per year)
     vic-education-zones      Victorian school zone boundaries (ZIP → SHP)
     vic-education-locations  DataVic school locations crosscheck (CSV)
+    ptv-gtfs                 PTV GTFS mode folders 1–4 (ZIP → stops.txt, routes.txt, ...)
     auction                  Domain Melbourne auction results (latest week)
     auction-backfill         Domain Melbourne auction results (all available history)
 
@@ -22,7 +23,7 @@ Group commands:
     dffh-rent     dffh-rent-moving-annual
     acara-school  acara-school-profile, acara-school-location
     vic-education vic-education-zones, vic-education-locations
-    all           abs, dffh-rent, acara-school, vcaa-sscai, vic-education
+    all           abs, dffh-rent, acara-school, vcaa-sscai, vic-education, ptv-gtfs
 
 Note: VicGov property sales is Cloudflare-protected — manual download required.
 See CLAUDE.md deployment notes for instructions.
@@ -56,6 +57,7 @@ _COMMANDS = {
     "vcaa-sscai": ("ingestion.vcaa_sscai", "fetch_sscai"),
     "vic-education-zones": ("ingestion.vic_education", "fetch_school_zones"),
     "vic-education-locations": ("ingestion.vic_education", "fetch_school_locations"),
+    "ptv-gtfs": ("ingestion.ptv_gtfs", "fetch_gtfs_raw"),
     "auction": ("ingestion.auction", "fetch_auction_results"),
     "auction-backfill": ("ingestion.auction", "fetch_auction_backfill"),
 }
@@ -65,7 +67,12 @@ _GROUPS = {
     "dffh-rent": _DFFH_RENT,
     "acara-school": _ACARA_SCHOOL,
     "vic-education": _VIC_EDUCATION,
-    "all": _ABS + _DFFH_RENT + _ACARA_SCHOOL + ["vcaa-sscai"] + _VIC_EDUCATION,
+    "all": _ABS
+    + _DFFH_RENT
+    + _ACARA_SCHOOL
+    + ["vcaa-sscai"]
+    + _VIC_EDUCATION
+    + ["ptv-gtfs"],
 }
 
 

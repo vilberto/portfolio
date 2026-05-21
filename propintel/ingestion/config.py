@@ -13,7 +13,14 @@ ACARA_SCHOOL_DIR = RAW_DIR / "acara-school"
 VCAA_SSCAI_DIR = RAW_DIR / "vcaa-sscai"
 VIC_EDUCATION_DIR = RAW_DIR / "vic-education"
 VICMAP_PLANNING_RAW_DIR = RAW_DIR / "vicmap-planning"
+PTV_GTFS_DIR = RAW_DIR / "ptv-gtfs"
 AUCTION_DIR = RAW_DIR / "auction"
+PTV_GTFS_URL = (
+    "https://opendata.transport.vic.gov.au/dataset/"
+    "3f4e292e-7f8a-4ffe-831f-1953be0fe448/resource/"
+    "fb152201-859f-4882-9206-b768060b50ad/download/gtfs.zip"
+)
+
 AUCTION_URL = "https://www.domain.com.au/auction-results/melbourne/"
 
 VICMAP_PLANNING_PROCESSED_DIR = PROCESSED_DIR / "vicmap-planning"
