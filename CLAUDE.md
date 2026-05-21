@@ -145,9 +145,9 @@ Pydeck (Carto basemap), LangGraph
 
 Fast-track MVP decision taken after Session 6. Session order adjusted:
 - Session 7: MVP fast track — working Pydeck map with house price 
-  choropleth + school zone toggle. See SESSION_7.md in scratch/.
+  choropleth + school zone toggle. See SESSION_7.md in session-md/.
 - Session 8: Remaining format conversion + full dbt/DuckDB coverage. 
-  See SESSION_8.md in scratch/.
+  See SESSION_8.md in session-md/.
 - Session 9: Remaining FastAPI + Pydeck layers + spatial intersection work.
 - Session 10: Auction digest email.
 - Sessions 11+: Continue as per upskill plan.
