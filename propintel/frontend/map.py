@@ -86,8 +86,15 @@ school_zones = fetch_school_zones()
 
 # --- Sidebar controls ---
 st.sidebar.header("Layers")
-zone_options = ["Off", "Primary", "Y7", "Y8", "Y9", "Y10", "Y11", "Y12"]
-selected_zone = st.sidebar.selectbox("School zones", zone_options)
+school_type = st.sidebar.segmented_control(
+    "School zones", ["Off", "Primary", "Secondary"], default="Off"
+)
+if school_type == "Secondary":
+    year_level = st.sidebar.segmented_control(
+        "Year level", ["Y7", "Y8", "Y9", "Y10", "Y11", "Y12"], default="Y7"
+    )
+else:
+    year_level = None
 font_size = st.sidebar.number_input(
     "Label size", min_value=8, max_value=20, value=12, step=1
 )
@@ -110,9 +117,9 @@ suburb_layer = st.session_state[suburb_cache_key]
 
 layers = []
 
-if selected_zone != "Off":
-    zone_level = "primary" if selected_zone == "Primary" else selected_zone
-    zone_cache_key = f"zone_{selected_zone}"
+if school_type != "Off":
+    zone_level = "primary" if school_type == "Primary" else year_level
+    zone_cache_key = f"zone_{zone_level}"
 
     if zone_cache_key not in st.session_state:
         filtered_zones = {
@@ -152,6 +159,7 @@ if selected_zone != "Off":
         get_position="position",
         get_text="name",
         get_size=font_size,
+        size_min_pixels=8,
         get_color=[0, 0, 0, 200],
         pickable=False,
     )
