@@ -122,40 +122,52 @@ suburb_metrics:
 - Join on lower(trim(sal_name)) = suburb_name; 95% match rate (724/762 price entries)
 
 school_zones_mart:
-- school_name, campus_name, entity_code, zone_level, geometry
+- school_name, campus_name, entity_code, zone_level
+- centroid_lng, centroid_lat — ST_X/ST_Y(ST_Centroid(geometry))
+- geometry
 
 dbt build: PASS=7, all models green. propintel.duckdb created at propintel/propintel.duckdb.
 Note: *.duckdb gitignored — rebuild with dbt build from propintel/dbt/.
 Note: rebuilding a staging model requires dbt build --select +<downstream_mart> not just --select <mart>.
 
-### Part C — FastAPI + Pydeck
+### Part C — FastAPI + Pydeck ✓ COMPLETE
 
-FastAPI setup:
-- propintel/api/main.py
-- Reads from propintel.duckdb (DuckDB connection, spatial extension loaded)
-- Two endpoints for MVP:
+FastAPI (propintel/api/main.py):
+- Single read-only DuckDB connection opened at startup via lifespan context manager
+- Both endpoints apply ST_Simplify(geometry, 0.0005) to keep payload under 200MB
 
 GET /suburbs
-- Returns GeoJSON FeatureCollection
-- Each feature: sal_code, sal_name, latest_median_house_price,
-  house_price_1y_change
+- Fields: sal_code, sal_name, latest_median_house_price, house_price_1y_change
 - Source: suburb_metrics mart
 
 GET /school-zones
-- Returns GeoJSON FeatureCollection
-- Each feature: school_name, zone_level
+- Fields: school_name, zone_level, centroid_lng, centroid_lat
 - Source: school_zones_mart
 
-Run FastAPI with uvicorn. Confirm both endpoints return valid GeoJSON.
-
-Pydeck map (propintel/frontend/map.py or map.html):
+Pydeck map (propintel/frontend/map.py):
 - Carto basemap, map_style='light' — no API key required
-- Layer 1 — PolygonLayer: suburb boundaries coloured by
-  latest_median_house_price (choropleth)
-  Hover tooltip: suburb name + median price + 1y change
-- Layer 2 — PolygonLayer: school zones (outline only, no fill)
-  Toggle: Primary / Y7 / Y8 / Y9 / Y10 / Y11 / Y12 / off (filter by zone_level)
-  Hover tooltip: school name + zone_level
+- Colour scale: Jenks natural breaks (mapclassify.NaturalBreaks, k=10) over a
+  10-class Purples palette. Computed once inside @st.cache_data, alpha=110.
+  Grey [160, 160, 160, 110] for suburbs with no price data.
+- Tooltip: pre-computed HTML stored as _tooltip feature property. Streamlit's
+  pydeck tooltip uses {field} → feature.properties.field directly (not
+  {properties.field} — that syntax does not work in Streamlit's pydeck). School
+  zone layer is pickable=False so no separate school tooltip.
+- Layer ordering (bottom → top): school GeoJsonLayer → TextLayer → suburb GeoJsonLayer
+- Suburb layer: pickable, auto_highlight, highlight_color white [255,255,255,220]
+- School zone layer: outline only [0,0,0,70], line_width_min_pixels=1, pickable=False.
+  Cached in session_state per zone level string (key: f"zone_{zone_level}").
+  Filtered GeoJSON also cached separately (key: f"zone_{zone_level}_data").
+- TextLayer: school name labels using flat list of {position, name} dicts (not GeoJSON).
+  Centroid coords sourced from school_zones_mart. Not cached (cheap to rebuild).
+- Suburb layer cached in session_state keyed on active metric ("suburb_layer_house_price").
+- School zone toggle: two-tier segmented_control
+    - Tier 1: Off / Primary / Secondary
+    - Tier 2 (Secondary only): 7 / 8 / 9 / 10 / 11 / 12
+    - zone_level resolved as "primary" or f"Y{year_level}" for DB filter
+- Label size: st.sidebar.number_input (8–20, default 12). Controls TextLayer get_size.
+  Note: size_min_pixels=8 present but labels do not auto-hide at zoom-out with
+  pixel units — TextLayer zoom-based suppression is parked for a later session.
 
 ## Key files to read at session start
 
@@ -173,6 +185,8 @@ Pydeck map (propintel/frontend/map.py or map.html):
 - FastAPI
 - uvicorn
 - Pydeck
+- streamlit
+- mapclassify (Jenks natural breaks)
 
 ## Engineering habits
 

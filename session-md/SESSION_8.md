@@ -10,10 +10,12 @@ ready for the remaining FastAPI and Pydeck work in Session 9.
 ## Where we are
 
 Session 7 complete. MVP map is working:
-- Suburb choropleth (house price) live
-- School zone toggle live
-- FastAPI serving both endpoints
+- Suburb choropleth (house price) live — Jenks/Purples colour scale
+- School zone toggle live — two-tier segmented_control (Off/Primary/Secondary + year 7–12)
+- School name TextLayer labels (zoom-based suppression parked)
+- FastAPI serving both endpoints with ST_Simplify(geometry, 0.0005)
 - propintel.duckdb exists with suburb_metrics and school_zones_mart
+  (school_zones_mart includes centroid_lng/centroid_lat)
 
 ## Session 8 scope
 
