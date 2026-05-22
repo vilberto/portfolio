@@ -15,8 +15,8 @@ import pydeck as pdk
 API_BASE = "http://localhost:8000"
 
 _PURPLES_10 = [
-    [242, 240, 247],
-    [218, 218, 235],
+    [210, 208, 232],
+    [188, 185, 218],
     [188, 189, 220],
     [158, 154, 200],
     [128, 125, 186],
@@ -104,7 +104,7 @@ if suburb_cache_key not in st.session_state:
         line_width_min_pixels=1,
         pickable=True,
         auto_highlight=True,
-        highlight_color=[255, 220, 0, 200],
+        highlight_color=[255, 255, 255, 220],
     )
 suburb_layer = st.session_state[suburb_cache_key]
 
@@ -127,8 +127,8 @@ if selected_zone != "Off":
             "GeoJsonLayer",
             data=filtered_zones,
             get_fill_color=[0, 0, 0, 0],
-            get_line_color=[0, 0, 0, 100],
-            line_width_min_pixels=1.5,
+            get_line_color=[0, 0, 0, 70],
+            line_width_min_pixels=1,
             pickable=False,
         )
         st.session_state[f"{zone_cache_key}_data"] = filtered_zones
