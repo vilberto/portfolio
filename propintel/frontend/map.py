@@ -91,7 +91,7 @@ school_type = st.sidebar.segmented_control(
 )
 if school_type == "Secondary":
     year_level = st.sidebar.segmented_control(
-        "Year level", ["Y7", "Y8", "Y9", "Y10", "Y11", "Y12"], default="Y7"
+        "Year level", ["7", "8", "9", "10", "11", "12"], default="7"
     )
 else:
     year_level = None
@@ -118,7 +118,7 @@ suburb_layer = st.session_state[suburb_cache_key]
 layers = []
 
 if school_type != "Off":
-    zone_level = "primary" if school_type == "Primary" else year_level
+    zone_level = "primary" if school_type == "Primary" else f"Y{year_level}"
     zone_cache_key = f"zone_{zone_level}"
 
     if zone_cache_key not in st.session_state:
