@@ -29,13 +29,13 @@ from ingestion.config import (
 _HOUSE_PRICE_COLS = [0, 1, 3, 5, 7, 9, 11, 12, 13, 14]
 _HOUSE_PRICE_NAMES = [
     "suburb_name",
-    "price_jul_sep_2024",
-    "price_oct_dec_2024",
-    "price_jan_mar_2025",
-    "price_apr_jun_2025",
-    "price_jul_sep_2025",
-    "no_of_sales_jul_sep_2025",
-    "no_of_sales_2025",
+    "price_qtr_lag4",
+    "price_qtr_lag3",
+    "price_qtr_lag2",
+    "price_qtr_lag1",
+    "price_latest",
+    "no_of_sales_latest",
+    "no_of_sales_ytd",
     "change_pct_1y",
     "change_pct_qoq",
 ]
@@ -73,7 +73,13 @@ def convert_sal_lookup() -> Path:
 
 
 def convert_house_price() -> Path:
-    src = VIC_PROPERTY_SALES_DIR / "median-house-q3-2025.xls"
+    files = sorted(VIC_PROPERTY_SALES_DIR.glob("median-house-*.xls*"))
+    if not files:
+        raise FileNotFoundError(
+            f"No median house price file found in {VIC_PROPERTY_SALES_DIR}"
+        )
+    src = files[-1]
+
     df = pd.read_excel(
         src,
         engine="xlrd",
@@ -85,6 +91,11 @@ def convert_house_price() -> Path:
     df = df[
         df["suburb_name"].notna() & (df["suburb_name"].astype(str).str.strip() != "")
     ]
+
+    # Extract quarter from filename e.g. "median-house-q3-2025" → "2025-Q3"
+    m = re.search(r"q(\d)-(\d{4})", src.stem)
+    if m:
+        df["price_quarter"] = f"{m.group(2)}-Q{m.group(1)}"
 
     out = PROCESSED_VIC_PROPERTY_SALES_DIR / "median_house_quarterly_latest.parquet"
     out.parent.mkdir(parents=True, exist_ok=True)

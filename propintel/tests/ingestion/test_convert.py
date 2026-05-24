@@ -82,15 +82,16 @@ def test_convert_house_price():
     assert "suburb_name" in df.columns, (
         f"suburb_name missing; got: {df.columns.tolist()}"
     )
-    assert "price_jul_sep_2025" in df.columns, (
-        f"price_jul_sep_2025 missing; got: {df.columns.tolist()}"
+    assert "price_latest" in df.columns, (
+        f"price_latest missing; got: {df.columns.tolist()}"
     )
     assert "change_pct_1y" in df.columns, (
         f"change_pct_1y missing; got: {df.columns.tolist()}"
     )
-    numeric_count = (
-        pd.to_numeric(df["price_jul_sep_2025"], errors="coerce").notna().sum()
+    assert "price_quarter" in df.columns, (
+        f"price_quarter missing; got: {df.columns.tolist()}"
     )
+    numeric_count = pd.to_numeric(df["price_latest"], errors="coerce").notna().sum()
     assert numeric_count > 100, (
         f"Expected > 100 numeric price rows; got {numeric_count}"
     )
