@@ -19,6 +19,13 @@ Session 7 complete. MVP map is working:
 
 ## Session 8 scope
 
+### Part 0 — Session-start housekeeping
+
+- Fix dbt sources.yml relative paths: replace hardcoded `read_parquet('../data/processed/...')`
+  with an env var or absolute path so `dbt build` works from any directory, not just propintel/dbt/.
+- Pin dbt-core and dbt-duckdb to `<2.0` in pyproject.toml (currently open-ended `>=1.8`).
+  Do this when pyproject.toml is open for new Session 8 dependencies.
+
 ### Part A — Remaining format conversions
 
 Add to ingestion/convert.py. Same pattern as Session 7:

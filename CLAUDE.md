@@ -40,10 +40,8 @@ Full-screen Pydeck choropleth map with three independent toggleable layers:
   attributes (name, ICSEA, enrolment, student-teacher ratio)
 - Secondary school catchments — same pattern for secondary schools
 
-When suburb layer and a school layer are active simultaneously, the map renders a
-pre-computed spatial intersection layer (GeoPandas overlay) so a single hover
-surfaces both suburb and school attributes. Intersection is pre-computed at pipeline
-time, not at request time.
+School zone layers render independently alongside the suburb layer — no spatial
+intersection is computed. Each layer is toggled and hovered separately.
  
 **Address Intelligence (Streamlit page 2)**
 - Address search bar — geocoded via Nominatim (OSM), no API key required
@@ -83,8 +81,6 @@ quirk, handled by dbt deduplication.
 - LangGraph agent owns conversation state for address intelligence; FastAPI is a
   thin HTTP wrapper, not business logic
 - Streamlit frontend calls FastAPI only; no direct access to ChromaDB or the agent
-- Spatial intersection of suburb and school catchment polygons is pre-computed with
-  GeoPandas; not computed at request time
 - Geocoding uses Nominatim via OSM — no API key required
 
 ### Inference strategy — important
@@ -148,7 +144,7 @@ Fast-track MVP decision taken after Session 6. Session order adjusted:
   choropleth + school zone toggle. See SESSION_7.md in session-md/.
 - Session 8: Remaining format conversion + full dbt/DuckDB coverage. 
   See SESSION_8.md in session-md/.
-- Session 9: Remaining FastAPI + Pydeck layers + spatial intersection work.
+- Session 9: Remaining FastAPI + Pydeck layers (metric toggle, additional choropleth metrics).
 - Session 10: Auction digest email.
 - Sessions 11+: Continue as per upskill plan.
 

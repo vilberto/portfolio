@@ -161,6 +161,7 @@ Pydeck map (propintel/frontend/map.py):
 - TextLayer: school name labels using flat list of {position, name} dicts (not GeoJSON).
   Centroid coords sourced from school_zones_mart. Not cached (cheap to rebuild).
 - Suburb layer cached in session_state keyed on active metric ("suburb_layer_house_price").
+  active_metric is hardcoded as "house_price" — generalise when metric toggle is added (Session 9).
 - School zone toggle: two-tier segmented_control
     - Tier 1: Off / Primary / Secondary
     - Tier 2 (Secondary only): 7 / 8 / 9 / 10 / 11 / 12
