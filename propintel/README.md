@@ -1,6 +1,6 @@
 # PropIntel
 
-Melbourne suburb intelligence platform. See the portfolio-level `CLAUDE.md` for architecture and design goals.
+Melbourne suburb intelligence platform.
 
 ---
 

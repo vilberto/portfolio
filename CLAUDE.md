@@ -2,9 +2,8 @@
 
 ## Purpose
 
-A production-quality data product and a foundations track, built to demonstrate
-AI/analytics engineering capability: real APIs, deployable services, and engineering
-habits that hold up under a technical screen.
+PropIntel (hero project) and a foundations/ track of smaller companion projects.
+See the Hero project section for full description.
 
 ## Repo layout
 
@@ -14,12 +13,13 @@ portfolio/
 │   ├── agent/          # LangGraph address scoring agent
 │   ├── api/            # FastAPI service
 │   ├── dbt/            # dbt models over DuckDB
-│   ├── frontend/       # Pydeck map + Streamlit UI
+│   ├── frontend/       # Streamlit/Pydeck MVP (retained as pipeline demo)
 │   ├── mcp/            # MCP server exposing PropIntel as tools
 │   ├── pipeline/       # Prefect orchestration
-│   └── rag/            # ChromaDB + Ollama RAG layer
+│   ├── rag/            # ChromaDB + Ollama RAG layer
+│   └── session-md/     # Per-session planning notes
 └── foundations/        # Foundational skills track
-    └── propwatch/      # Property listing alerts (learning artefact)
+    └── propwatch/      # Property listing alerts (parked — Akamai block)
 ```
 
 ## Hero project — PropIntel
@@ -135,18 +135,28 @@ ABS open data, VicGov / DFFH open data, ACARA, VCAA, data.vic.gov.au, OSM
 ChromaDB, Ollama (embeddings), Claude API (generation + web search), Streamlit,
 Pydeck (Carto basemap), LangGraph
 
+**Frontend:** React + Vite + MapLibre GL JS + deck.gl — replaces Streamlit/Pydeck
+post-Session 8. Streamlit MVP retained as pipeline demo. See
+`propintel/session-md/FRONTEND.md` for full context.
+
+**RAG:** ChromaDB + Ollama (nomic-embed-text embeddings) + Claude API generation.
+Summaries pre-generated at pipeline time, stored in DuckDB, served statically.
+
 ---
 
 ## Session plan changes (as of Session 6)
 
 Fast-track MVP decision taken after Session 6. Session order adjusted:
 - Session 7: MVP fast track — working Pydeck map with house price 
-  choropleth + school zone toggle. See SESSION_7.md in session-md/.
-- Session 8: Remaining format conversion + full dbt/DuckDB coverage. 
-  See SESSION_8.md in session-md/.
-- Session 9: Remaining FastAPI + Pydeck layers (metric toggle, additional choropleth metrics).
-- Session 10: Auction digest email.
-- Sessions 11+: Continue as per upskill plan.
+  choropleth + school zone toggle. See SESSION_7.md in propintel/session-md/.
+- Session 8: Extended — remaining format conversion + full dbt/DuckDB coverage +
+  RAG layer (document builder, embedder, retriever, generate_summaries, FastAPI
+  endpoint, Streamlit sidebar panel). See SESSION_8.md and SESSION_8_ADDENDUM.md
+  in propintel/session-md/.
+- Frontend rebuild (React + Vite + MapLibre + deck.gl) begins after Session 8.
+  Replaces the Streamlit UI session in the original plan. See
+  `propintel/session-md/FRONTEND.md` for frontend stack decisions and UX flows.
+- Sessions 9+: To be re-planned after Session 8 is complete.
 
 ---
 
@@ -191,7 +201,7 @@ Place files in `data/raw/vicmap-planning/` (zones ~130MB, overlays ~650MB)
 
 ## Foundations track
 
-- **propwatch** — Melbourne property listing alerter (learning artefact); scraper, deduplication, HTML digest, and GitHub Actions CI are complete. Domain.com.au confirmed inaccessible to individual developers — Akamai block and robots.txt enforcement both confirmed. Data source closed; see foundations/propwatch/SPIKE.md.
+- **propwatch** — Melbourne property listing alerter; scraper, deduplication, HTML digest, and GitHub Actions CI are complete. Domain.com.au confirmed inaccessible to individual developers — Akamai block and robots.txt enforcement both confirmed. Data source closed; see foundations/propwatch/SPIKE.md.
 
 ---
 
