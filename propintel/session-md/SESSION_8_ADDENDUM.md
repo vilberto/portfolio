@@ -60,10 +60,34 @@ in sources.yml (`../data/processed/...`) valid without rewriting them.
 
 ### Part B — Format conversions + full dbt mart build
 
+**Working pattern (read at the start of each new CC session):**
+
+Session 8 spans multiple CC sessions. Follow this protocol for every source:
+
+1. User inspects the raw file and reports key structural facts (shape, columns,
+   quirks). Claude confirms and flags anything missed. Data model agreed before
+   any code is written.
+2. Convert function first — output natural shape to parquet, minimal
+   transformation.
+3. Smoke test after each convert: file exists, size > 0, loads back with expected
+   schema. Do not proceed until user confirms pass.
+4. Staging model second — normalisation and business logic live here, not in
+   convert.
+5. `dbt build --select <model>` + `dbt test --select <model>` after each staging
+   model. Do not batch.
+6. Mart extensions last — only after all relevant staging models are built and
+   tested.
+
+Never jump ahead. One source at a time. No batching across models.
+
 **Config additions first:** add `PROCESSED_DFFH_DIR`, `PROCESSED_ACARA_DIR`,
 `PROCESSED_VCAA_DIR` to `ingestion/config.py` before any convert functions.
 
 **Convert functions — priority order:**
+
+Rename first: `convert_house_price()` → `convert_house_price_quarterly()` in
+`convert.py` and its run.py command `convert-house-price` →
+`convert-house-price-quarterly`. No logic change, rename only.
 
 | Priority | Function | Input | Output |
 |---|---|---|---|
@@ -89,15 +113,15 @@ year. Union model uses only columns consistent across all years.
 run.py additions:
 - Individual `convert-*` commands for all new functions
 - `convert` group — runs all conversions (MVP + new), sequential
+- Delete `convert-mvp` group once `convert` group is in place (no longer needed)
 
 **Staging models:**
 
 | Model | Source | Notes |
 |---|---|---|
-| `stg_seifa` | seifa.parquet | IRSD, IEO, IER, IRSAD scores + deciles |
-| `stg_house_price_series` | house_price_series.parquet | For 5y price change |
-| `stg_unit_price_quarterly` | unit_price_quarterly.parquet | Latest unit price |
-| `stg_unit_price_series` | unit_price_series.parquet | Unit time series |
+| `stg_seifa` | seifa.parquet | IRSAD state percentile (primary), plus IRSD/IEO/IER state percentiles. Filter to VIC and exclude quality-flagged rows (col Q = 'Y') here in staging, not in convert. Drop national percentiles and raw scores — state percentile (1–100) is more meaningful for a Victoria-only product and more granular than decile. |
+| `stg_house_price` | house_price_quarterly.parquet + house_price_series.parquet | Single model, union both into long-form (suburb_name, period, median_price). Quarterly covers Q4 2024–Q3 2025; series covers 2014–2024 annual. Mart derives latest/1y/5y from this single model. |
+| `stg_unit_price` | unit_price_quarterly.parquet + unit_price_series.parquet | Same pattern as stg_house_price |
 | `stg_rent` | rent_moving_annual.parquet | Moving annual rent |
 | `stg_acara_school_profile` | school_profile.parquet | ICSEA, enrolment, student-teacher ratio |
 | `stg_acara_school_location` | school_location.parquet | lat/lng per school |
@@ -107,28 +131,47 @@ run.py additions:
 | `stg_planning_zones` | zones.parquet | If vicmap SHPs confirmed |
 | `stg_planning_overlays` | overlays.parquet | If vicmap SHPs confirmed |
 
+Convert functions output their natural shape (minimal transformation). Staging
+models own the unioning, normalisation, filtering, and column selection — not
+convert functions. The one exception is large geo files (e.g. Vicmap planning
+at 650MB+) where filtering to Melbourne LGAs in convert is a practical necessity,
+not a business logic call.
+
 **Suburb name crosswalk:**
 
 Sources that join on suburb name strings (no SAL code): house price series,
 unit prices, DFFH rent, auction results.
 
-Approach:
-- dbt seed: `propintel/dbt/seeds/suburb_name_crosswalk.csv`
-- Columns: `raw_suburb_name` (lowercased, stripped), `sal_name` (ABS canonical name)
-- No `sal_code` in seed — sal_code ownership stays in sal_lookup
-- Join pattern: `stg → crosswalk (raw name → sal_name) → sal_lookup (sal_name → sal_code) → mart`
-- Pre-populated with three known house price mismatches:
+**Design decisions to make before starting marts** (revisit here, do not assume prior plan):
+
+1. **Master suburb name.** ABS `SAL_NAME21` from `sal_lookup.parquet` is the
+   canonical list. All source suburb names map to it.
+
+2. **Regex vs crosswalk-everything.** Preference is crosswalk-everything — no
+   `lower()`, `trim()`, or `regexp_replace` scattered across staging models.
+   All name normalisation lives in one place. Open question: does
+   `stg_suburb_boundary`'s existing `regexp_replace` (strips trailing `(Vic.)`)
+   stay or go? If it goes, `sal_name` in `stg_suburb_boundary` becomes the raw
+   `SAL_NAME21`, and the crosswalk maps source raw names to that exact string.
+   Decision deferred until just before marts.
+
+3. **Seed schema:** `raw_suburb_name` (lowercased, stripped), `sal_name`
+   (exact `SAL_NAME21` string). No `sal_code` — ownership stays in sal_lookup.
+   Join pattern: `stg → crosswalk → sal_lookup (sal_name → sal_code) → mart`.
+
+4. **Seed population:** grows row-by-row as each staging model reveals mismatches.
+   Do not pre-fill for sources not yet inspected. Spatial join preferred where
+   lat/lng is available (ACARA, VCAA via ACARA) — crosswalk is for name-only
+   sources only.
+
+Temporary entries for three known house price mismatches (to be seeded once
+design decisions above are resolved):
 
   | raw_suburb_name | sal_name |
   |---|---|
   | kew north | Kew East |
   | bellfield (banyule) | Bellfield (Banyule - Vic.) |
   | hillside (melton) | Hillside (Melton - Vic.) |
-
-- Seed grows row-by-row as each staging model reveals new mismatches. Do not
-  pre-fill for sources not yet built.
-- Spatial join preferred where lat/lng is available (ACARA, VCAA via ACARA).
-  Crosswalk is for name-only sources only.
 
 **Marts:**
 

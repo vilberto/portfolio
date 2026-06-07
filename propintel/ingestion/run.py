@@ -18,6 +18,13 @@ Individual commands:
     auction                  Domain Melbourne auction results (latest week)
     auction-backfill         Domain Melbourne auction results (all available history)
 
+Convert commands:
+    convert-abs-boundary     ABS SAL boundary SHP → processed/abs/sal_boundary.parquet
+    convert-sal-lookup       ABS SAL metadata XLSX → processed/abs/sal_lookup.parquet
+    convert-house-price      VicGov median house price XLS → processed/vic-property-sales/
+    convert-school-zones     School zone SHPs → processed/vic-education/
+    convert-seifa            SEIFA XLSX → processed/abs/seifa.parquet
+
 Group commands:
     abs           abs-seifa, abs-census, abs-sal-boundary
     dffh-rent     dffh-rent-moving-annual
@@ -65,6 +72,7 @@ _COMMANDS = {
     "convert-sal-lookup": ("ingestion.convert", "convert_sal_lookup"),
     "convert-house-price": ("ingestion.convert", "convert_house_price"),
     "convert-school-zones": ("ingestion.convert", "convert_school_zones"),
+    "convert-seifa": ("ingestion.convert", "convert_seifa"),
 }
 
 _CONVERT_MVP = [

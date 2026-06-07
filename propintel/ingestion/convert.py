@@ -8,6 +8,7 @@ Usage (via run.py):
     python -m ingestion.run convert-sal-lookup
     python -m ingestion.run convert-house-price
     python -m ingestion.run convert-school-zones
+    python -m ingestion.run convert-seifa
     python -m ingestion.run convert-mvp
 """
 
@@ -26,6 +27,16 @@ from ingestion.config import (
     VIC_PROPERTY_SALES_DIR,
 )
 
+_SEIFA_SHEETS = [
+    (
+        "Table 3",
+        "irsad",
+    ),  # spine — primary metric; sal_name and state sourced from here
+    ("Table 2", "irsd"),
+    ("Table 4", "ier"),
+    ("Table 5", "ieo"),
+]
+
 _HOUSE_PRICE_COLS = [0, 1, 3, 5, 7, 9, 11, 12, 13, 14]
 _HOUSE_PRICE_NAMES = [
     "suburb_name",
@@ -39,6 +50,51 @@ _HOUSE_PRICE_NAMES = [
     "change_pct_1y",
     "change_pct_qoq",
 ]
+
+
+def convert_seifa() -> Path:
+    src = ABS_DIR / "seifa_sal.xlsx"
+    if not src.exists():
+        raise FileNotFoundError(f"SEIFA file not found: {src}")
+
+    frames = []
+    for sheet, prefix in _SEIFA_SHEETS:
+        df = pd.read_excel(src, sheet_name=sheet, header=5, usecols=[0, 1, 9, 12, 16])
+        df.columns = [
+            "sal_code",
+            "sal_name",
+            "state",
+            f"{prefix}_state_pct",
+            f"{prefix}_quality_flag",
+        ]
+        # Drop non-data rows (empty cells, copyright footer) — artifact removal, not business logic
+        df = df[pd.to_numeric(df["sal_code"], errors="coerce").notna()]
+        df["sal_code"] = df["sal_code"].astype(str).str.strip()
+        frames.append(df)
+
+    # IRSAD is the spine — left join the other three indexes onto it
+    spine_prefix = _SEIFA_SHEETS[0][1]
+    result = frames[0][
+        [
+            "sal_code",
+            "sal_name",
+            "state",
+            f"{spine_prefix}_state_pct",
+            f"{spine_prefix}_quality_flag",
+        ]
+    ]
+    for df in frames[1:]:
+        pct_cols = [
+            c
+            for c in df.columns
+            if c.endswith("_state_pct") or c.endswith("_quality_flag")
+        ]
+        result = result.merge(df[["sal_code"] + pct_cols], on="sal_code", how="left")
+
+    out = PROCESSED_ABS_DIR / "seifa.parquet"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    result.to_parquet(out, compression="snappy", index=False)
+    return out
 
 
 def convert_abs_boundary() -> Path:

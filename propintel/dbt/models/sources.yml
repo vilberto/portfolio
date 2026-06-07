@@ -8,6 +8,10 @@ sources:
         meta:
           external_location: "read_parquet('../data/processed/abs/sal_boundary.parquet')"
 
+      - name: seifa
+        meta:
+          external_location: "read_parquet('../data/processed/abs/seifa.parquet')"
+
       - name: sal_lookup
         meta:
           external_location: "read_parquet('../data/processed/abs/sal_lookup.parquet')"
