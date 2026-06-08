@@ -224,11 +224,11 @@ def convert_sal_lookup() -> Path:
     return out
 
 
-def convert_house_price_quarterly() -> Path:
-    files = sorted(VIC_PROPERTY_SALES_DIR.glob("median-house-*.xls*"))
+def _convert_price_quarterly(glob_pattern: str, out_name: str) -> Path:
+    files = sorted(VIC_PROPERTY_SALES_DIR.glob(glob_pattern))
     if not files:
         raise FileNotFoundError(
-            f"No median house price file found in {VIC_PROPERTY_SALES_DIR}"
+            f"No file matching '{glob_pattern}' found in {VIC_PROPERTY_SALES_DIR}"
         )
     src = files[-1]
 
@@ -249,10 +249,22 @@ def convert_house_price_quarterly() -> Path:
     if m:
         df["price_quarter"] = f"{m.group(2)}-Q{m.group(1)}"
 
-    out = PROCESSED_VIC_PROPERTY_SALES_DIR / "house_price_quarterly.parquet"
+    out = PROCESSED_VIC_PROPERTY_SALES_DIR / out_name
     out.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(out, compression="snappy")
     return out
+
+
+def convert_house_price_quarterly() -> Path:
+    return _convert_price_quarterly(
+        "median-house-*.xls*", "house_price_quarterly.parquet"
+    )
+
+
+def convert_unit_price_quarterly() -> Path:
+    return _convert_price_quarterly(
+        "median-unit-*.xls*", "unit_price_quarterly.parquet"
+    )
 
 
 def convert_school_zones() -> list[Path]:
@@ -276,9 +288,14 @@ def convert_school_zones() -> list[Path]:
     return outputs
 
 
-# Each year spans 3–4 columns; the source Excel uses irregular merged cells across
-# these ranges — column boundaries were derived by inspecting the raw file directly.
-_HOUSE_PRICE_SERIES_YEAR_RANGES = {
+_PRICE_THRESHOLD = 50_000
+# Empty string is intentionally excluded: non-top-left cells of an openpyxl merged
+# range return '' (not NaN) with keep_default_na=False, and must not block carry-forward.
+_EXPLICIT_NULL_TOKENS = {"-", "na", "^", "null", "n/a", "nan", "none"}
+
+# Column boundaries were derived by inspecting each raw file directly.
+# House series: each year spans 3–4 columns with irregular merged cells.
+_HOUSE_SERIES_YEAR_RANGES: dict[int, tuple[int, int]] = {
     2014: (5, 8),
     2015: (8, 11),
     2016: (11, 14),
@@ -292,16 +309,31 @@ _HOUSE_PRICE_SERIES_YEAR_RANGES = {
     2024: (37, 41),
     2025: (41, 44),
 }
-_PRICE_THRESHOLD = 50_000
-# Empty string is intentionally excluded: non-top-left cells of an openpyxl merged
-# range return '' (not NaN) with keep_default_na=False, and must not block carry-forward.
-_EXPLICIT_NULL_TOKENS = {"-", "na", "^", "null", "n/a", "nan", "none"}
+# Unit series: single-column years with some 2-column merged pairs; col G (index 6)
+# is a separator not belonging to any year.
+_UNIT_SERIES_YEAR_RANGES: dict[int, tuple[int, int]] = {
+    2014: (2, 3),
+    2015: (3, 4),
+    2016: (4, 5),
+    2017: (5, 6),
+    2018: (7, 8),
+    2019: (8, 10),
+    2020: (10, 12),
+    2021: (12, 13),
+    2022: (13, 14),
+    2023: (14, 16),
+    2024: (16, 18),
+    2025: (18, 20),
+}
 
 
-def _parse_house_price_series_row(row: "pd.Series") -> dict:  # type: ignore[name-defined]
+def _parse_price_series_row(
+    row: "pd.Series",  # type: ignore[name-defined]
+    year_ranges: dict[int, tuple[int, int]],
+) -> dict:
     """Extract one median price per year from a single suburb row.
 
-    The source Excel is a PDF-export artefact with heavy cell merging and two
+    The source Excels are PDF-export artefacts with heavy cell merging and two
     structural quirks this function handles:
 
     1. Two-value merged cell: when sample sizes differ, VicGov stores two
@@ -317,12 +349,12 @@ def _parse_house_price_series_row(row: "pd.Series") -> dict:  # type: ignore[nam
     contains an explicit null token (NA, -, ^) to avoid copying a prior year's
     value into a genuinely missing year.
     """
-    years = sorted(_HOUSE_PRICE_SERIES_YEAR_RANGES)
+    years = sorted(year_ranges)
     buckets: dict[int, list[float]] = {}
     explicit_null: dict[int, bool] = {}
 
     for yr in years:
-        start, end = _HOUSE_PRICE_SERIES_YEAR_RANGES[yr]
+        start, end = year_ranges[yr]
         found: list[float] = []
         has_null_token = False
         for col in range(start, min(end, len(row))):
@@ -364,15 +396,19 @@ def _parse_house_price_series_row(row: "pd.Series") -> dict:  # type: ignore[nam
     return {yr: (buckets[yr][0] if buckets[yr] else None) for yr in years}
 
 
-def convert_house_price_series() -> Path:
-    src = VIC_PROPERTY_SALES_DIR / "houses-by-suburb-2014-2024.xlsx"
+def _convert_price_series(
+    src_name: str,
+    year_ranges: dict[int, tuple[int, int]],
+    out_name: str,
+    header_rows: int,
+) -> Path:
+    src = VIC_PROPERTY_SALES_DIR / src_name
     if not src.exists():
-        raise FileNotFoundError(f"House price series file not found: {src}")
+        raise FileNotFoundError(f"Price series file not found: {src}")
 
-    # keep_default_na=False keeps "NA"/"-" as strings so _EXPLICIT_NULL_TOKENS fires;
-    # rows 0-3 are multi-row headers — data starts at row 4
+    # keep_default_na=False keeps "NA"/"-" as strings so _EXPLICIT_NULL_TOKENS fires
     raw = pd.read_excel(src, header=None, engine="openpyxl", keep_default_na=False)
-    data = raw.iloc[4:].reset_index(drop=True)
+    data = raw.iloc[header_rows:].reset_index(drop=True)
 
     records = []
     for _, row in data.iterrows():
@@ -380,14 +416,31 @@ def convert_house_price_series() -> Path:
         if not suburb or suburb.lower() in ("nan", "locality", ""):
             continue
         rec = {"suburb_name": suburb}
-        rec.update(_parse_house_price_series_row(row))
+        rec.update(_parse_price_series_row(row, year_ranges))
         records.append(rec)
 
-    df = pd.DataFrame(records)
-    out = PROCESSED_VIC_PROPERTY_SALES_DIR / "house_price_series.parquet"
+    out = PROCESSED_VIC_PROPERTY_SALES_DIR / out_name
     out.parent.mkdir(parents=True, exist_ok=True)
-    df.to_parquet(out, compression="snappy", index=False)
+    pd.DataFrame(records).to_parquet(out, compression="snappy", index=False)
     return out
+
+
+def convert_house_price_series() -> Path:
+    return _convert_price_series(
+        "houses-by-suburb-2014-2024.xlsx",
+        _HOUSE_SERIES_YEAR_RANGES,
+        "house_price_series.parquet",
+        header_rows=4,
+    )
+
+
+def convert_unit_price_series() -> Path:
+    return _convert_price_series(
+        "units-by-suburb-2014-2024.xlsx",
+        _UNIT_SERIES_YEAR_RANGES,
+        "unit_price_series.parquet",
+        header_rows=2,
+    )
 
 
 def convert_acara_school_location() -> Path:

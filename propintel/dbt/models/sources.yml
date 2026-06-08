@@ -24,6 +24,14 @@ sources:
         meta:
           external_location: "read_parquet('../data/processed/vic-property-sales/house_price_series.parquet')"
 
+      - name: unit_price_quarterly
+        meta:
+          external_location: "read_parquet('../data/processed/vic-property-sales/unit_price_quarterly.parquet')"
+
+      - name: unit_price_series
+        meta:
+          external_location: "read_parquet('../data/processed/vic-property-sales/unit_price_series.parquet')"
+
       - name: school_zones_primary_integrated
         meta:
           external_location: "read_parquet('../data/processed/vic-education/school_zones_primary_integrated.parquet')"
