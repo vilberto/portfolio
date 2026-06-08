@@ -25,6 +25,8 @@ Convert commands:
     convert-school-zones     School zone SHPs → processed/vic-education/
     convert-seifa            SEIFA XLSX → processed/abs/seifa.parquet
     convert-dffh-rent        DFFH rent XLSX → processed/dffh-rent/rent_moving_annual.parquet
+    convert-acara-location   ACARA school location XLSX → processed/acara-school/school_location.parquet
+    convert-acara-profile    ACARA school profile XLSX → processed/acara-school/school_profile.parquet
 
 Group commands:
     abs           abs-seifa, abs-census, abs-sal-boundary
@@ -75,6 +77,8 @@ _COMMANDS = {
     "convert-school-zones": ("ingestion.convert", "convert_school_zones"),
     "convert-seifa": ("ingestion.convert", "convert_seifa"),
     "convert-dffh-rent": ("ingestion.convert", "convert_dffh_rent"),
+    "convert-acara-location": ("ingestion.convert", "convert_acara_school_location"),
+    "convert-acara-profile": ("ingestion.convert", "convert_acara_school_profile"),
 }
 
 _CONVERT_MVP = [

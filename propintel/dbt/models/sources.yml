@@ -51,3 +51,11 @@ sources:
       - name: rent_moving_annual
         meta:
           external_location: "read_parquet('../data/processed/dffh-rent/rent_moving_annual.parquet')"
+
+      - name: acara_school_location
+        meta:
+          external_location: "read_parquet('../data/processed/acara-school/school_location.parquet')"
+
+      - name: acara_school_profile
+        meta:
+          external_location: "read_parquet('../data/processed/acara-school/school_profile.parquet')"

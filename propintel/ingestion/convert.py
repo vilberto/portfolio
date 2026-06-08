@@ -19,8 +19,10 @@ import geopandas as gpd
 import pandas as pd
 
 from ingestion.config import (
+    ACARA_SCHOOL_DIR,
     ABS_DIR,
     DFFH_RENT_DIR,
+    PROCESSED_ACARA_DIR,
     PROCESSED_ABS_DIR,
     PROCESSED_DFFH_DIR,
     PROCESSED_VIC_EDUCATION_DIR,
@@ -272,3 +274,31 @@ def convert_school_zones() -> list[Path]:
         outputs.append(out)
 
     return outputs
+
+
+def convert_acara_school_location() -> Path:
+    src = ACARA_SCHOOL_DIR / "school_location.xlsx"
+    if not src.exists():
+        raise FileNotFoundError(f"ACARA school location file not found: {src}")
+
+    # Sheet index 1 (data dictionary is sheet 0); name is year-specific so use index
+    df = pd.read_excel(src, sheet_name=1, engine="openpyxl")
+
+    out = PROCESSED_ACARA_DIR / "school_location.parquet"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(out, compression="snappy", index=False)
+    return out
+
+
+def convert_acara_school_profile() -> Path:
+    src = ACARA_SCHOOL_DIR / "school_profile.xlsx"
+    if not src.exists():
+        raise FileNotFoundError(f"ACARA school profile file not found: {src}")
+
+    # Sheet index 1 (data dictionary is sheet 0); name is year-specific so use index
+    df = pd.read_excel(src, sheet_name=1, engine="openpyxl")
+
+    out = PROCESSED_ACARA_DIR / "school_profile.parquet"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(out, compression="snappy", index=False)
+    return out
