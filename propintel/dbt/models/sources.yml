@@ -47,3 +47,7 @@ sources:
       - name: school_zones_secondary_integrated_year12
         meta:
           external_location: "read_parquet('../data/processed/vic-education/school_zones_secondary_integrated_year12.parquet')"
+
+      - name: rent_moving_annual
+        meta:
+          external_location: "read_parquet('../data/processed/dffh-rent/rent_moving_annual.parquet')"

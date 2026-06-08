@@ -1,0 +1,35 @@
+version: 2
+
+models:
+  - name: stg_rent
+    description: >
+      DFFH moving annual rent by suburb group and property type, fanned out to
+      individual SALs via the dffh_suburb_group_mapping seed. Group Total rows
+      and unmapped groups (e.g. Yarra Ranges) retain sal_code = null and serve
+      as regional benchmarks; filter on is_group_total in the mart.
+    columns:
+      - name: suburb_group
+        tests:
+          - not_null
+      - name: region
+        tests:
+          - not_null
+      - name: property_type
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - "1 bedroom flat"
+                  - "2 bedroom flat"
+                  - "3 bedroom flat"
+                  - "2 bedroom house"
+                  - "3 bedroom house"
+                  - "4 bedroom house"
+                  - "All properties"
+      - name: latest_quarter
+        tests:
+          - not_null
+      - name: is_group_total
+        tests:
+          - not_null
