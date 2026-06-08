@@ -20,6 +20,10 @@ sources:
         meta:
           external_location: "read_parquet('../data/processed/vic-property-sales/median_house_quarterly_latest.parquet')"
 
+      - name: house_price_series
+        meta:
+          external_location: "read_parquet('../data/processed/vic-property-sales/house_price_series.parquet')"
+
       - name: school_zones_primary_integrated
         meta:
           external_location: "read_parquet('../data/processed/vic-education/school_zones_primary_integrated.parquet')"

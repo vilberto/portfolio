@@ -98,6 +98,14 @@ Rename first: `convert_house_price()` → `convert_house_price_quarterly()` in
 | 2nd | `convert_house_price_series()` | `vic-property-sales/houses-by-suburb-2014-2024.xlsx` | `processed/vic-property-sales/house_price_series.parquet` |
 | 2nd | `convert_unit_price_quarterly()` | `vic-property-sales/median-unit-q3-2025.xls` | `processed/vic-property-sales/unit_price_quarterly.parquet` |
 | 2nd | `convert_unit_price_series()` | `vic-property-sales/units-by-suburb-2014-2024.xlsx` | `processed/vic-property-sales/unit_price_series.parquet` |
+| 3rd | `convert_house_price_metro_quarterly()` | `vic-property-sales/yearly-summary-q4-2025.xls` (manual seed) | `processed/vic-property-sales/house_price_metro_quarterly.parquet` |
+| 3rd | `convert_house_price_metro_series()` | `vic-property-sales/year-summary-2024.xlsx` (manual seed) | `processed/vic-property-sales/house_price_metro_series.parquet` |
+
+Melbourne metro benchmark sources (manual seed — same Cloudflare-protected landing page as suburb data):
+- Quarterly: `yearly-summary-q4-2025.xls` — Melbourne-wide medians by property type per quarter
+- Annual series: `year-summary-2024.xlsx` — Melbourne-wide annual medians
+
+Pick up benchmark ingestion after suburb quarterly + series convert+staging is complete. When downloading benchmarks, also refresh the suburb quarterly file from Q3 2025 → Q4 2025 (Q4 data now available) and smoke-test the ingestion update mechanism end-to-end.
 | 3rd | `convert_vcaa_sscai()` | `vcaa-sscai/sscai_2022–2025.xlsx` | `processed/vcaa-sscai/sscai_{year}.parquet` |
 | 3rd | `convert_vicmap_planning()` | vicmap SHPs | `processed/vicmap-planning/zones.parquet` + `overlays.parquet` |
 
@@ -120,8 +128,10 @@ run.py additions:
 | Model | Source | Notes |
 |---|---|---|
 | `stg_seifa` | seifa.parquet | IRSAD state percentile (primary), plus IRSD/IEO/IER state percentiles. Filter to VIC and exclude quality-flagged rows (col Q = 'Y') here in staging, not in convert. Drop national percentiles and raw scores — state percentile (1–100) is more meaningful for a Victoria-only product and more granular than decile. |
-| `stg_house_price` | house_price_quarterly.parquet + house_price_series.parquet | Single model, union both into long-form (suburb_name, period, median_price). Quarterly covers Q4 2024–Q3 2025; series covers 2014–2024 annual. Mart derives latest/1y/5y from this single model. |
-| `stg_unit_price` | unit_price_quarterly.parquet + unit_price_series.parquet | Same pattern as stg_house_price |
+| `stg_house_price_quarterly` | house_price_quarterly.parquet | Column selection + rename only. Keeps pre-computed `change_pct_1y` (same-quarter year-ago) and `change_pct_qoq` from source — do not recalculate. |
+| `stg_house_price_series` | house_price_series.parquet | Long-form: (suburb_name, year, median_price). Annual medians 2014–2025 (prelim). Used for 5y/10y growth and time-series visualisation. |
+| `stg_unit_price_quarterly` | unit_price_quarterly.parquet | Same pattern as stg_house_price_quarterly. |
+| `stg_unit_price_series` | unit_price_series.parquet | Same pattern as stg_house_price_series. |
 | `stg_rent` | rent_moving_annual.parquet | 7 sheets stacked with property_type; convert forward-fills region, extracts latest/prev/year-ago quarters only. Staging joins to `dffh_suburb_group_mapping` seed + sal_lookup to resolve sal_code — fan-out expected (one suburb_group → multiple SALs). Group Total rows kept with sal_code = null as region benchmarks; mart filters them separately. Mapping belongs in staging, not mart. |
 | `stg_acara_school_profile` | school_profile.parquet | ICSEA, enrolment, student-teacher ratio |
 | `stg_acara_school_location` | school_location.parquet | lat/lng per school |
@@ -210,7 +220,15 @@ design decisions above are resolved):
 
 `suburb_metrics` (extended):
 - SEIFA scores/deciles
-- Latest median unit price, unit price 1y change, unit price 5y change
+- Latest median unit price, unit price 1y change
+- **5y and 10y change — decision deferred to mart build.** Quarterly figures carry
+  seasonal variation (Melbourne spring/auction peak vs winter trough, ~3–8%). Comparing
+  latest quarterly against annual median from N years ago is a common approximation but
+  introduces this noise. Directional signal remains valid for long-run growth. Decide
+  at mart build time whether to include, and if so add a note to the API response.
+- **All relative metrics (QoQ, 1y, 5y, 10y) should be accompanied by the Melbourne
+  metro benchmark equivalent** (from stg_house_price_metro_* and stg_unit_price_metro_*).
+  Park this until benchmark convert+staging is done.
 - Median rent
 - Affordability ratio: median house price ÷ median household income (census)
 - Median income from census (required for affordability calc)

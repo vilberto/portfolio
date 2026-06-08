@@ -1,6 +1,14 @@
 version: 2
 
 models:
+  - name: stg_house_price_series
+    columns:
+      - name: suburb_name
+        tests:
+          - not_null
+      - name: year
+        tests:
+          - not_null
   - name: stg_rent
     description: >
       DFFH moving annual rent by suburb group and property type, fanned out to

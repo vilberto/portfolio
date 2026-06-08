@@ -276,6 +276,120 @@ def convert_school_zones() -> list[Path]:
     return outputs
 
 
+# Each year spans 3–4 columns; the source Excel uses irregular merged cells across
+# these ranges — column boundaries were derived by inspecting the raw file directly.
+_HOUSE_PRICE_SERIES_YEAR_RANGES = {
+    2014: (5, 8),
+    2015: (8, 11),
+    2016: (11, 14),
+    2017: (14, 18),
+    2018: (18, 21),
+    2019: (21, 24),
+    2020: (24, 27),
+    2021: (27, 30),
+    2022: (30, 33),
+    2023: (33, 37),
+    2024: (37, 41),
+    2025: (41, 44),
+}
+_PRICE_THRESHOLD = 50_000
+# Empty string is intentionally excluded: non-top-left cells of an openpyxl merged
+# range return '' (not NaN) with keep_default_na=False, and must not block carry-forward.
+_EXPLICIT_NULL_TOKENS = {"-", "na", "^", "null", "n/a", "nan", "none"}
+
+
+def _parse_house_price_series_row(row: "pd.Series") -> dict:  # type: ignore[name-defined]
+    """Extract one median price per year from a single suburb row.
+
+    The source Excel is a PDF-export artefact with heavy cell merging and two
+    structural quirks this function handles:
+
+    1. Two-value merged cell: when sample sizes differ, VicGov stores two
+       consecutive year medians as a single space-separated string in one merged
+       cell (e.g. '1051500   960000'). The first value belongs to the current
+       year, the second to the next year.
+
+    2. Single-value merged cell: very small samples yield one median covering
+       both years. The same value is duplicated into the next year's slot.
+
+    In both cases the *next* year's column range is empty (openpyxl returns None
+    for non-top-left merge cells). Carry-forward is suppressed when the source
+    contains an explicit null token (NA, -, ^) to avoid copying a prior year's
+    value into a genuinely missing year.
+    """
+    years = sorted(_HOUSE_PRICE_SERIES_YEAR_RANGES)
+    buckets: dict[int, list[float]] = {}
+    explicit_null: dict[int, bool] = {}
+
+    for yr in years:
+        start, end = _HOUSE_PRICE_SERIES_YEAR_RANGES[yr]
+        found: list[float] = []
+        has_null_token = False
+        for col in range(start, min(end, len(row))):
+            val = row.iloc[col]
+            if pd.isna(val):
+                continue
+            # Source uses '^' as a data-quality marker prefix; strip it before parsing
+            s = str(val).strip().replace("^\n", "").lstrip("^").strip()
+            if not s:
+                continue
+            if s.lower() in _EXPLICIT_NULL_TOKENS:
+                has_null_token = True
+                continue
+            for token in re.split(r"\s+", s):
+                token = token.replace(",", "").lstrip("^").strip()
+                try:
+                    n = float(token)
+                    if n > _PRICE_THRESHOLD:
+                        found.append(n)
+                except ValueError:
+                    continue
+        buckets[yr] = found
+        # explicit_null distinguishes "source said no data" from "cell was empty"
+        explicit_null[yr] = has_null_token and not found
+
+    for i, yr in enumerate(years[:-1]):
+        next_yr = years[i + 1]
+        prices = buckets[yr]
+        # next year's range is empty — could be a merged carry situation or genuine gap
+        if not buckets[next_yr] and not explicit_null[next_yr]:
+            if len(prices) >= 2:
+                # Two-value string: split across this year and next
+                buckets[next_yr] = [prices[1]]
+                buckets[yr] = [prices[0]]
+            elif len(prices) == 1:
+                # Single value covering both years: duplicate into next year
+                buckets[next_yr] = [prices[0]]
+
+    return {yr: (buckets[yr][0] if buckets[yr] else None) for yr in years}
+
+
+def convert_house_price_series() -> Path:
+    src = VIC_PROPERTY_SALES_DIR / "houses-by-suburb-2014-2024.xlsx"
+    if not src.exists():
+        raise FileNotFoundError(f"House price series file not found: {src}")
+
+    # keep_default_na=False keeps "NA"/"-" as strings so _EXPLICIT_NULL_TOKENS fires;
+    # rows 0-3 are multi-row headers — data starts at row 4
+    raw = pd.read_excel(src, header=None, engine="openpyxl", keep_default_na=False)
+    data = raw.iloc[4:].reset_index(drop=True)
+
+    records = []
+    for _, row in data.iterrows():
+        suburb = str(row.iloc[0]).strip() if pd.notna(row.iloc[0]) else ""
+        if not suburb or suburb.lower() in ("nan", "locality", ""):
+            continue
+        rec = {"suburb_name": suburb}
+        rec.update(_parse_house_price_series_row(row))
+        records.append(rec)
+
+    df = pd.DataFrame(records)
+    out = PROCESSED_VIC_PROPERTY_SALES_DIR / "house_price_series.parquet"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(out, compression="snappy", index=False)
+    return out
+
+
 def convert_acara_school_location() -> Path:
     src = ACARA_SCHOOL_DIR / "school_location.xlsx"
     if not src.exists():
