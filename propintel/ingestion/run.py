@@ -21,8 +21,8 @@ Individual commands:
 Convert commands:
     convert-abs-boundary     ABS SAL boundary SHP → processed/abs/sal_boundary.parquet
     convert-sal-lookup       ABS SAL metadata XLSX → processed/abs/sal_lookup.parquet
-    convert-house-price         VicGov median house price XLS → processed/vic-property-sales/
-    convert-house-price-series  VicGov house price annual series XLSX → processed/vic-property-sales/house_price_series.parquet
+    convert-house-price-quarterly  VicGov median house price XLS → processed/vic-property-sales/house_price_quarterly.parquet
+    convert-house-price-series     VicGov house price annual series XLSX → processed/vic-property-sales/house_price_series.parquet
     convert-school-zones        School zone SHPs → processed/vic-education/
     convert-seifa            SEIFA XLSX → processed/abs/seifa.parquet
     convert-dffh-rent        DFFH rent XLSX → processed/dffh-rent/rent_moving_annual.parquet
@@ -74,7 +74,10 @@ _COMMANDS = {
     "auction-backfill": ("ingestion.auction", "fetch_auction_backfill"),
     "convert-abs-boundary": ("ingestion.convert", "convert_abs_boundary"),
     "convert-sal-lookup": ("ingestion.convert", "convert_sal_lookup"),
-    "convert-house-price": ("ingestion.convert", "convert_house_price"),
+    "convert-house-price-quarterly": (
+        "ingestion.convert",
+        "convert_house_price_quarterly",
+    ),
     "convert-house-price-series": ("ingestion.convert", "convert_house_price_series"),
     "convert-school-zones": ("ingestion.convert", "convert_school_zones"),
     "convert-seifa": ("ingestion.convert", "convert_seifa"),
@@ -86,7 +89,7 @@ _COMMANDS = {
 _CONVERT_MVP = [
     "convert-abs-boundary",
     "convert-sal-lookup",
-    "convert-house-price",
+    "convert-house-price-quarterly",
     "convert-school-zones",
 ]
 

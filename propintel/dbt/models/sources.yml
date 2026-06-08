@@ -16,9 +16,9 @@ sources:
         meta:
           external_location: "read_parquet('../data/processed/abs/sal_lookup.parquet')"
 
-      - name: house_price
+      - name: house_price_quarterly
         meta:
-          external_location: "read_parquet('../data/processed/vic-property-sales/median_house_quarterly_latest.parquet')"
+          external_location: "read_parquet('../data/processed/vic-property-sales/house_price_quarterly.parquet')"
 
       - name: house_price_series
         meta:

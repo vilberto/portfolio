@@ -224,7 +224,7 @@ def convert_sal_lookup() -> Path:
     return out
 
 
-def convert_house_price() -> Path:
+def convert_house_price_quarterly() -> Path:
     files = sorted(VIC_PROPERTY_SALES_DIR.glob("median-house-*.xls*"))
     if not files:
         raise FileNotFoundError(
@@ -249,7 +249,7 @@ def convert_house_price() -> Path:
     if m:
         df["price_quarter"] = f"{m.group(2)}-Q{m.group(1)}"
 
-    out = PROCESSED_VIC_PROPERTY_SALES_DIR / "median_house_quarterly_latest.parquet"
+    out = PROCESSED_VIC_PROPERTY_SALES_DIR / "house_price_quarterly.parquet"
     out.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(out, compression="snappy")
     return out
