@@ -24,6 +24,7 @@ Convert commands:
     convert-house-price      VicGov median house price XLS → processed/vic-property-sales/
     convert-school-zones     School zone SHPs → processed/vic-education/
     convert-seifa            SEIFA XLSX → processed/abs/seifa.parquet
+    convert-dffh-rent        DFFH rent XLSX → processed/dffh-rent/rent_moving_annual.parquet
 
 Group commands:
     abs           abs-seifa, abs-census, abs-sal-boundary
@@ -73,6 +74,7 @@ _COMMANDS = {
     "convert-house-price": ("ingestion.convert", "convert_house_price"),
     "convert-school-zones": ("ingestion.convert", "convert_school_zones"),
     "convert-seifa": ("ingestion.convert", "convert_seifa"),
+    "convert-dffh-rent": ("ingestion.convert", "convert_dffh_rent"),
 }
 
 _CONVERT_MVP = [

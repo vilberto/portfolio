@@ -20,7 +20,9 @@ import pandas as pd
 
 from ingestion.config import (
     ABS_DIR,
+    DFFH_RENT_DIR,
     PROCESSED_ABS_DIR,
+    PROCESSED_DFFH_DIR,
     PROCESSED_VIC_EDUCATION_DIR,
     PROCESSED_VIC_PROPERTY_SALES_DIR,
     VIC_EDUCATION_DIR,
@@ -97,6 +99,96 @@ def convert_seifa() -> Path:
     return out
 
 
+_DFFH_RENT_SHEETS = [
+    "1 bedroom flat",
+    "2 bedroom flat",
+    "3 bedroom flat",
+    "2 bedroom house",
+    "3 bedroom house",
+    "4 bedroom house",
+    "All properties",
+]
+
+
+def _dffh_quarter_col_map(src: Path) -> tuple[dict[int, str], str]:
+    """Parse quarter headers from the first sheet (all sheets share the same layout).
+
+    Returns ({excel_col_idx: col_name}, latest_quarter_label).
+    Detects latest, prev, and year-ago quarters dynamically from the file headers.
+    """
+    raw = pd.read_excel(src, sheet_name=_DFFH_RENT_SHEETS[0], header=None, nrows=3)
+    quarters = raw.iloc[1, 2:].tolist()
+    labels = raw.iloc[2, 2:].tolist()
+
+    quarter_map: dict[str, dict[str, int]] = {}
+    for offset, (q, label) in enumerate(zip(quarters, labels)):
+        if pd.isna(q) or pd.isna(label):
+            continue
+        q_str = str(q).strip()
+        l_str = str(label).strip().lower()
+        col_idx = offset + 2  # +2 for cols A and B
+        quarter_map.setdefault(q_str, {})[l_str] = col_idx
+
+    sorted_quarters = sorted(
+        quarter_map, key=lambda q: pd.to_datetime(q, format="%b %Y")
+    )
+    latest = sorted_quarters[-1]
+    prev = sorted_quarters[-2]
+    year_ago = (
+        pd.to_datetime(latest, format="%b %Y") - pd.DateOffset(years=1)
+    ).strftime("%b %Y")
+
+    col_name_map: dict[int, str] = {
+        quarter_map[latest]["count"]: "latest_count",
+        quarter_map[latest]["median"]: "latest_median",
+        quarter_map[prev]["count"]: "prev_count",
+        quarter_map[prev]["median"]: "prev_median",
+        quarter_map[year_ago]["count"]: "year_ago_count",
+        quarter_map[year_ago]["median"]: "year_ago_median",
+    }
+    return col_name_map, latest
+
+
+def convert_dffh_rent() -> Path:
+    src = DFFH_RENT_DIR / "rent_moving_annual.xlsx"
+    if not src.exists():
+        raise FileNotFoundError(f"DFFH rent file not found: {src}")
+
+    col_name_map, latest_quarter = _dffh_quarter_col_map(src)
+    # Sort so pandas returns columns in file order before renaming
+    data_usecols = sorted(col_name_map)
+    usecols = [0, 1] + data_usecols
+    col_names = ["region", "suburb_group"] + [col_name_map[c] for c in data_usecols]
+
+    frames = []
+    for sheet in _DFFH_RENT_SHEETS:
+        df = pd.read_excel(
+            src,
+            sheet_name=sheet,
+            header=None,
+            skiprows=3,
+            usecols=usecols,
+            na_values=["-"],
+        )
+        df.columns = col_names
+        df["region"] = df["region"].ffill()
+        df = df[
+            df["suburb_group"].notna()
+            & (df["suburb_group"].astype(str).str.strip() != "")
+        ]
+        df["is_group_total"] = df["suburb_group"] == "Group Total"
+        df["property_type"] = sheet
+        df["latest_quarter"] = latest_quarter
+        frames.append(df)
+
+    result = pd.concat(frames, ignore_index=True)
+
+    out = PROCESSED_DFFH_DIR / "rent_moving_annual.parquet"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    result.to_parquet(out, compression="snappy", index=False)
+    return out
+
+
 def convert_abs_boundary() -> Path:
     shp_files = list((ABS_DIR / "boundary").glob("*.shp"))
     if not shp_files:
@@ -121,6 +213,8 @@ def convert_sal_lookup() -> Path:
     )
     df = pd.read_excel(src, sheet_name="2021_ASGS_Non_ABS_Structures", dtype=str)
     df = df[df["ASGS_Structure"] == "SAL"].reset_index(drop=True)
+    # sal_code: plain 5-digit string matching SAL_CODE21 in the boundary shapefile
+    df["sal_code"] = df["Census_Code_2021"].str.replace("SAL", "", regex=False)
 
     out = PROCESSED_ABS_DIR / "sal_lookup.parquet"
     out.parent.mkdir(parents=True, exist_ok=True)

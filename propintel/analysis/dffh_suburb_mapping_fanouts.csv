@@ -1,0 +1,77 @@
+sal_name,suggested_group,my_confidence,centroid_inside,boundary_intersects,notes,action,hull_intersects,suggested_confirmed
+Aberfeldie,Essendon,M,,"Moonee Ponds-Ascot Vale, Essendon",Small pocket between Essendon and Moonee Ponds,,,False
+Airport West,Gladstone Park-Tullamarine,H,,"Keilor East-Avondale Heights, Gladstone Park-Tullamarine, Keilor",Adjacent to Tullamarine,,,False
+Albanvale,St Albans-Deer Park,H,,St Albans-Deer Park,"Brimbank LGA, contiguous",,,False
+Albion,Sunshine,M,,"Sunshine, St Albans-Deer Park","Brimbank LGA, near Sunshine/St Albans border",yes,Sunshine,True
+Balaclava,Prahran-Windsor,H,,"Elwood, East St Kilda, St Kilda","St Kilda Rd corridor, directly between Prahran and St Kilda",,,False
+Bellfield (Banyule),Heidelberg-Heidelberg West,H,,"Ivanhoe-Ivanhoe East, Heidelberg-Heidelberg West, Preston","Banyule LGA, wedged between Heidelberg and Reservoir",,,False
+Black Rock,Hampton-Beaumaris,H,,"Hampton-Beaumaris, Cheltenham","Bayside LGA, between Beaumaris and Sandringham",yes,Hampton-Beaumaris,True
+Braybrook,Footscray,H,,"West Footscray, Sunshine, Keilor East-Avondale Heights","Maribyrnong LGA, immediately west of Footscray",,,False
+Briar Hill,Eltham-Research-Montmorency,M,,"Bundoora-Greensborough-Hurstbridge, Eltham-Research-Montmorency","Banyule LGA, between Montmorency and Greensborough",yes,Eltham-Research-Montmorency,True
+Brooklyn,Altona,M,,"Altona, Sunshine, Yarraville-Seddon","Hobsons Bay LGA, industrial/residential near Altona North",,,False
+Campbellfield,Broadmeadows-Roxburgh Park,H,,"Thomastown-Lalor, Mill Park-Epping, Reservoir, Oak Park-Glenroy-Fawkner, Broadmeadows-Roxburgh Park","Hume LGA, adjacent to Broadmeadows",,,False
+Chirnside Park,Croydon-Lilydale,H,,Croydon-Lilydale,"Yarra Ranges LGA, between Lilydale and Croydon",yes,Croydon-Lilydale,True
+Clarinda,Clayton,H,,"Clayton, Chadstone-Oakleigh","Kingston LGA, directly adjacent to Clayton South",,,False
+Cobblebank,Melton,H,,Melton,"Melton LGA, new suburb within Melton",yes,Melton,True
+Coolaroo,Broadmeadows-Roxburgh Park,H,,Broadmeadows-Roxburgh Park,"Hume LGA, adjacent to Broadmeadows",yes,Broadmeadows-Roxburgh Park,True
+Dallas,Broadmeadows-Roxburgh Park,H,,Broadmeadows-Roxburgh Park,"Hume LGA, adjacent to Broadmeadows",yes,Broadmeadows-Roxburgh Park,True
+Deepdene,Kew,H,,"Canterbury-Surrey Hills-Mont Albert, Kew, Balwyn","Boroondara LGA, enclave within Kew/Balwyn area",,,False
+Delahey,Keilor East-Avondale Heights,M,,"St Albans-Deer Park, Keilor, Sydenham","Brimbank LGA, near Keilor East/Taylors Lakes",,,False
+Derrimut,Sunshine,M,,"Sunshine, St Albans-Deer Park","Brimbank LGA, between Deer Park and Sunshine West",,,False
+Diamond Creek,Bundoora-Greensborough-Hurstbridge,M,,"Bundoora-Greensborough-Hurstbridge, Eltham-Research-Montmorency","Nillumbik LGA, beyond Greensborough toward Hurstbridge",yes,Bundoora-Greensborough-Hurstbridge,True
+Dingley Village,Cheltenham,M,,"Mentone-Parkdale-Mordialloc, Clayton, Springvale","Kingston LGA, between Cheltenham and Dandenong",,,False
+Doveton,Dandenong North-Endeavour Hills,H,,"Dandenong, Dandenong North-Endeavour Hills","Casey LGA, adjacent to Dandenong North",,,False
+Edithvale,Aspendale-Chelsea-Carrum,H,,Aspendale-Chelsea-Carrum,"Kingston LGA, directly adjacent to Aspendale",yes,Aspendale-Chelsea-Carrum,True
+Essendon Fields,Essendon,M,,Essendon,"Moonee Valley LGA, airport precinct adjacent to Essendon",,,False
+Gardenvale,Brighton,H,,"Brighton East, Elsternwick, Caulfield, Brighton","Bayside LGA, enclave within Brighton/Elsternwick border",,,False
+Glen Huntly,Carnegie,H,,"Carnegie, Caulfield","Glen Eira LGA, directly adjacent to Carnegie",,,False
+Gowanbrae,Gladstone Park-Tullamarine,H,,"Gladstone Park-Tullamarine, Oak Park-Glenroy-Fawkner","Moreland/Hume border, adjacent to Gladstone Park",,,False
+Greenvale,Broadmeadows-Roxburgh Park,M,,"Broadmeadows-Roxburgh Park, Craigieburn","Hume LGA, further north; may be DFFH gap",,,False
+Hadfield,Oak Park-Glenroy-Fawkner,H,,"Pascoe Vale-Coburg North, Oak Park-Glenroy-Fawkner","Merri-bek LGA, directly adjacent to Glenroy",yes,Oak Park-Glenroy-Fawkner,True
+Hallam,Narre Warren-Hampton Park,H,,"Narre Warren-Hampton Park, Dandenong North-Endeavour Hills","Casey LGA, directly adjacent",yes,Narre Warren-Hampton Park,True
+Heatherton,Clayton,M,,"Cheltenham, Bentleigh, Chadstone-Oakleigh","Kingston LGA, between Clayton and Cheltenham",,,False
+Heathmont,Ringwood,H,,"Wantirna-Scoresby, Bayswater, Ringwood","Maroondah LGA, directly adjacent",,,False
+Highett,Cheltenham,H,,"Hampton-Beaumaris, Cheltenham","Bayside/Kingston border, directly adjacent",yes,Hampton-Beaumaris,False
+Hillside (Melton),Keilor East-Avondale Heights,M,,Sydenham,"Melton LGA, near Keilor area; also crosswalk note",,,False
+Jacana,Broadmeadows-Roxburgh Park,H,,"Gladstone Park-Tullamarine, Oak Park-Glenroy-Fawkner, Broadmeadows-Roxburgh Park","Hume LGA, adjacent to Broadmeadows",,,False
+Kealba,St Albans-Deer Park,H,,"Sunshine, St Albans-Deer Park, Keilor East-Avondale Heights, Keilor","Brimbank LGA, adjacent to St Albans",,,False
+Keysborough,Noble Park,M,,"Dandenong, Noble Park, Springvale","Greater Dandenong LGA, between Noble Park and Dandenong",,,False
+Kilsyth,Croydon-Lilydale,H,,"Boronia, Croydon-Lilydale","Maroondah/Yarra Ranges, between Croydon and Lilydale",yes,Croydon-Lilydale,True
+Kingsbury,Reservoir,H,,"Bundoora-Greensborough-Hurstbridge, Reservoir","Darebin LGA, adjacent to Reservoir",,,False
+Kingsville,Yarraville-Seddon,H,,"West Footscray, Yarraville-Seddon","Hobsons Bay LGA, adjacent to Yarraville",,,False
+Knoxfield,Rowville,H,,"Rowville, Ferntree Gully, Wantirna-Scoresby, Boronia","Knox LGA, adjacent to Rowville",,,False
+Kooyong,Hawthorn,H,,"Malvern, Toorak, East Hawthorn, Hawthorn","Stonnington LGA, small enclave between Hawthorn and Malvern",,,False
+Laverton,Altona,M,,Altona,"Hobsons Bay LGA, west of Altona; some distance",,,False
+Lower Plenty,Eltham-Research-Montmorency,M,,"Bulleen-Templestowe-Doncaster, Eltham-Research-Montmorency","Banyule LGA, between Montmorency and Research",,,False
+Lynbrook,Cranbourne,M,,Narre Warren-Hampton Park,"Casey LGA, outer south-east; may be DFFH gap",,,False
+Lyndhurst,Cranbourne,M,,"Cranbourne, Seaford-Carrum Downs","Casey LGA, adjacent to Cranbourne area",,,False
+Lysterfield,Rowville,M,,"Narre Warren-Hampton Park, Rowville, Ferntree Gully","Knox LGA, beyond Rowville toward Dandenong Ranges",,,False
+Macleod,Heidelberg-Heidelberg West,H,,"Heidelberg-Heidelberg West, Bundoora-Greensborough-Hurstbridge","Banyule LGA, between Heidelberg and Bundoora",,,False
+Maidstone,Footscray,H,,"West Footscray, Keilor East-Avondale Heights, Footscray","Maribyrnong LGA, adjacent to Footscray/Braybrook",,,False
+Maribyrnong,Footscray,H,,"Keilor East-Avondale Heights, Footscray, Moonee Ponds-Ascot Vale, Essendon","Maribyrnong LGA (suburb), adjacent to Footscray",,,False
+McKinnon,Bentleigh,H,,"Bentleigh, Brighton East","Glen Eira LGA, adjacent to Bentleigh",,,False
+Meadow Heights,Broadmeadows-Roxburgh Park,H,,Broadmeadows-Roxburgh Park,"Hume LGA, adjacent to Broadmeadows",yes,Broadmeadows-Roxburgh Park,True
+Montrose,Croydon-Lilydale,M,,Croydon-Lilydale,"Yarra Ranges LGA, beyond Lilydale; may be DFFH gap",,,False
+Moorabbin,Bentleigh,M,,"Hampton-Beaumaris, Cheltenham, Bentleigh, Brighton East, Chadstone-Oakleigh","Kingston LGA, between Bentleigh and Cheltenham",,,False
+Niddrie,Essendon,H,,"Keilor East-Avondale Heights, Essendon","Moonee Valley LGA, adjacent to Essendon North",,,False
+Notting Hill,Chadstone-Oakleigh,H,,"Clayton, Glen Waverley-Mulgrave, Mount Waverley","Monash LGA, between Glen Waverley and Oakleigh",,,False
+Ormond,Carnegie,H,,"Bentleigh, Brighton East, Carnegie, Caulfield","Glen Eira LGA, directly adjacent to Carnegie",,,False
+Princes Hill,Carlton North,H,,"Carlton North, East Brunswick, Brunswick","Melbourne LGA, small enclave adjacent to Carlton North",,,False
+Ravenhall,Keilor East-Avondale Heights,M,,St Albans-Deer Park,"Melton LGA, near Keilor East/Deer Park border",,,False
+Ripponlea,Elsternwick,H,,"Elsternwick, Elwood, East St Kilda","Glen Eira LGA, directly adjacent to Elsternwick",,,False
+Rosanna,Heidelberg-Heidelberg West,H,,Heidelberg-Heidelberg West,"Banyule LGA, directly adjacent to Heidelberg",yes,Heidelberg-Heidelberg West,True
+Sandringham,Hampton-Beaumaris,H,,"Hampton-Beaumaris, Cheltenham","Bayside LGA, between Hampton and Black Rock",yes,Hampton-Beaumaris,True
+Seabrook,Altona,H,,Altona,"Hobsons Bay LGA, adjacent to Altona Meadows",,,False
+Seaholme,Altona,H,,Altona,"Hobsons Bay LGA, small pocket within Altona",,,False
+South Kingsville,Newport-Spotswood,H,,"Altona, Newport-Spotswood","Hobsons Bay LGA, adjacent to Spotswood",,,False
+South Morang,Mill Park-Epping,H,,Mill Park-Epping,"Whittlesea LGA, adjacent to Mill Park",,,False
+South Wharf,Docklands,H,,"South Melbourne, CBD-St Kilda Rd, Southbank, Docklands","Melbourne LGA, directly adjacent to Docklands",,,False
+Strathmore,Essendon,H,,"Essendon, Coburg-Pascoe Vale South, Pascoe Vale-Coburg North, Oak Park-Glenroy-Fawkner","Moonee Valley LGA, adjacent to Essendon North/Niddrie",,,False
+Strathmore Heights,Essendon,H,,"Gladstone Park-Tullamarine, Oak Park-Glenroy-Fawkner","Moonee Valley LGA, adjacent to Strathmore",,,False
+Taylors Hill,Keilor East-Avondale Heights,H,,Sydenham,"Melton/Brimbank border, adjacent to Keilor East",,,False
+Taylors Lakes,Keilor East-Avondale Heights,H,,"Keilor, Sydenham","Brimbank LGA, adjacent to Keilor East",yes,Keilor,False
+Tottenham,Footscray,H,,"West Footscray, Sunshine, Yarraville-Seddon","Hobsons Bay LGA, adjacent to Footscray/Sunshine border",,,False
+Viewbank,Heidelberg-Heidelberg West,H,,"Bulleen-Templestowe-Doncaster, Heidelberg-Heidelberg West","Banyule LGA, adjacent to Heidelberg",,,False
+Westmeadows,Gladstone Park-Tullamarine,H,,"Gladstone Park-Tullamarine, Broadmeadows-Roxburgh Park","Hume LGA, directly adjacent to Gladstone Park",,,False
+Wheelers Hill,Rowville,H,,"Rowville, Glen Waverley-Mulgrave, Wantirna-Scoresby","Monash LGA, adjacent to Rowville",yes,Glen Waverley-Mulgrave,False
+Yallambie,Heidelberg-Heidelberg West,H,,"Bundoora-Greensborough-Hurstbridge, Eltham-Research-Montmorency","Banyule LGA, between Heidelberg and Bundoora",,,False

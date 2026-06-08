@@ -122,7 +122,7 @@ run.py additions:
 | `stg_seifa` | seifa.parquet | IRSAD state percentile (primary), plus IRSD/IEO/IER state percentiles. Filter to VIC and exclude quality-flagged rows (col Q = 'Y') here in staging, not in convert. Drop national percentiles and raw scores — state percentile (1–100) is more meaningful for a Victoria-only product and more granular than decile. |
 | `stg_house_price` | house_price_quarterly.parquet + house_price_series.parquet | Single model, union both into long-form (suburb_name, period, median_price). Quarterly covers Q4 2024–Q3 2025; series covers 2014–2024 annual. Mart derives latest/1y/5y from this single model. |
 | `stg_unit_price` | unit_price_quarterly.parquet + unit_price_series.parquet | Same pattern as stg_house_price |
-| `stg_rent` | rent_moving_annual.parquet | Moving annual rent |
+| `stg_rent` | rent_moving_annual.parquet | 7 sheets stacked with property_type; convert forward-fills region, extracts latest/prev/year-ago quarters only. Staging joins to `dffh_suburb_group_mapping` seed + sal_lookup to resolve sal_code — fan-out expected (one suburb_group → multiple SALs). Group Total rows kept with sal_code = null as region benchmarks; mart filters them separately. Mapping belongs in staging, not mart. |
 | `stg_acara_school_profile` | school_profile.parquet | ICSEA, enrolment, student-teacher ratio |
 | `stg_acara_school_location` | school_location.parquet | lat/lng per school |
 | `stg_vcaa_sscai` | sscai_*.parquet | Union across years; consistent cols only |
@@ -163,6 +163,39 @@ unit prices, DFFH rent, auction results.
    Do not pre-fill for sources not yet inspected. Spatial join preferred where
    lat/lng is available (ACARA, VCAA via ACARA) — crosswalk is for name-only
    sources only.
+
+**DFFH rent uses a separate seed — `dffh_suburb_group_mapping.csv`:**
+
+DFFH suburb groups are arbitrary aggregations that don't correspond 1:1 to SALs.
+They warrant a dedicated seed rather than the main crosswalk.
+
+- Columns: `suburb_group` (DFFH string as-is), `sal_name` (ABS canonical)
+- One-to-many: one suburb_group row per SAL it covers (e.g. "Doncaster East-Donvale"
+  → two rows, one for each SAL)
+- Group Total rows do not appear in this seed — they stay as region benchmarks
+  with sal_code = null in stg_rent
+- Build strategy: query stg_rent for distinct suburb_group values, auto-match
+  against sal_lookup on lowercased name, export unmatched ones for manual review.
+  Do not pre-populate before stg_rent is built.
+
+**Mapping methodology — three-step approach (see `dbt/seeds/dffh_mapping_notes.md` for detail):**
+
+Naive string matching was rejected — DFFH names are abbreviated, reordered
+("East Brunswick" → "Brunswick East"), or cover multiple SALs with no clear
+delimiter. Three steps were used instead:
+
+1. Non-naive name correction — pattern-based fixes for known DFFH conventions
+2. AI geography knowledge — Melbourne suburb knowledge used to suggest group
+   assignments for Greater Melbourne SALs not in the mapping
+3. Convex hull spatial validation — centroid hull of group members used to
+   spatially confirm or contradict AI suggestions
+
+58 candidates remain unconfirmed by the hull and are accepted as low-confidence.
+Full audit trail in `analysis/dffh_suburb_mapping_fanouts.csv`.
+
+**Do not add a `source` column to the main crosswalk preemptively.** DFFH rent
+is handled by its own seed. If a genuine same-name collision appears in the main
+crosswalk across datasets, add `source` at that point.
 
 Temporary entries for three known house price mismatches (to be seeded once
 design decisions above are resolved):
