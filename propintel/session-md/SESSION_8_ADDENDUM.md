@@ -148,7 +148,7 @@ run.py additions:
 | `stg_acara_school_location` | school_location.parquet | lat/lng per school |
 | `stg_vcaa_sscai` | sscai_*.parquet | Union across years; consistent cols only |
 | `stg_census` | raw/abs/census/*.csv | Income, age, household size, dwelling type — external CSV sources, no conversion |
-| `stg_auction_results` | raw/auction/*.csv | Per-auction CSV; scraper already parsed to structured format |
+| `stg_auction_results` | raw/auction/*.csv | Per-auction CSV; glob reads all weekly files; dedup by `(domain_id, week_ending)` keeping latest `scraped_at`. AUPP ("Passed In Prior") is Domain's "Postponed" — excluded from clearance rate denominator. Clearance rate formula: `count(Sold + Sold Prior) / count(all except Passed In Prior)`. Validated against Domain adjClearanceRate — within ~1pp. |
 | `stg_planning_zones` | zones.parquet | Column selection; inspect ZONESTATUS values before adding any filter |
 | `stg_planning_overlays` | overlays.parquet | Same pattern as stg_planning_zones |
 
