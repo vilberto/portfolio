@@ -112,11 +112,22 @@ Pick up benchmark ingestion after suburb quarterly + series convert+staging is c
 Census: no format conversion. Raw CSVs in `data/raw/abs/census/` are
 DuckDB-readable natively — declared as external sources directly in sources.yml.
 
-Vicmap planning: raw dir showed codelist files, not SHP geometry. Confirm SHP
-files exist before writing `convert_vicmap_planning`. If absent, drop from scope.
+Vicmap planning SHPs confirmed present:
+- `data/raw/vicmap-planning/PLAN_ZONE_CODELIST/.../PLAN_ZONE_CODELIST.shp` — 111 MB, GDA2020
+- `data/raw/vicmap-planning/PLAN_OVERLAY_CODELIST/.../PLAN_OVERLAY_CODELIST.shp` — 543 MB, GDA2020
+
+Both share the same schema: `PFI`, `SCHEMECODE`, `LGA_CODE`, `LGA`, `ZONE_NUM`,
+`ZONESTATUS`, `ZONE_CODE`, `ZONE_DESC`, `GAZ_B_DATE`, `CODEPARENT`, `ZNCODEGRP`,
+`ZNCODEGRPL`, `PFI_CR`, `UFI`, `UFI_CR` + geometry.
+
+Convert: filter to Melbourne metro LGAs via the `LGA` column (avoids spatial join),
+reproject GDA2020 → EPSG:4326. Retain: `LGA_CODE`, `LGA`, `ZONE_CODE`, `ZONE_DESC`,
+`ZNCODEGRP`, `ZNCODEGRPL`, `ZONESTATUS` + geometry. Inspect distinct `LGA` values
+before hardcoding the Melbourne metro filter list.
 
 Before `convert_vcaa_sscai`: inspect all four XLSX files. Document schema per
 year. Union model uses only columns consistent across all years.
+(VCAA SSCAI convert+staging complete as of session 2026-06-10.)
 
 run.py additions:
 - Individual `convert-*` commands for all new functions
@@ -138,8 +149,8 @@ run.py additions:
 | `stg_vcaa_sscai` | sscai_*.parquet | Union across years; consistent cols only |
 | `stg_census` | raw/abs/census/*.csv | Income, age, household size, dwelling type — external CSV sources, no conversion |
 | `stg_auction_results` | raw/auction/*.csv | Per-auction CSV; scraper already parsed to structured format |
-| `stg_planning_zones` | zones.parquet | If vicmap SHPs confirmed |
-| `stg_planning_overlays` | overlays.parquet | If vicmap SHPs confirmed |
+| `stg_planning_zones` | zones.parquet | Column selection; inspect ZONESTATUS values before adding any filter |
+| `stg_planning_overlays` | overlays.parquet | Same pattern as stg_planning_zones |
 
 Convert functions output their natural shape (minimal transformation). Staging
 models own the unioning, normalisation, filtering, and column selection — not
@@ -215,6 +226,21 @@ design decisions above are resolved):
   | kew north | Kew East |
   | bellfield (banyule) | Bellfield (Banyule - Vic.) |
   | hillside (melton) | Hillside (Melton - Vic.) |
+
+**School name crosswalk (VCAA → ACARA):**
+
+VCAA SSCAI identifies schools by name + locality only (no ACARA ID). ACARA has
+canonical school names and ACARA IDs. A crosswalk is needed before any VCAA–ACARA
+join can be built in a mart.
+
+- Seed: `school_name_crosswalk.csv` — columns: `vcaa_school` (raw VCAA name),
+  `vcaa_locality` (raw VCAA locality), `acara_school_name` (exact ACARA name string)
+- Locality used for disambiguation where school name is not unique across the state
+- Population strategy: query distinct `(school, locality)` from `stg_vcaa_sscai`,
+  attempt case-insensitive match against `stg_acara_school_profile`, export unmatched
+  pairs for manual review. Do not pre-populate before both staging models exist.
+- This crosswalk is for mart use only — `stg_vcaa_sscai` stays name-only; the join
+  to ACARA lives in `school_profiles` mart.
 
 **Marts:**
 
