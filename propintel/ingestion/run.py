@@ -23,8 +23,10 @@ Convert commands:
     convert-sal-lookup       ABS SAL metadata XLSX → processed/abs/sal_lookup.parquet
     convert-house-price-quarterly  VicGov median house price XLS → processed/vic-property-sales/house_price_quarterly.parquet
     convert-house-price-series     VicGov house price annual series XLSX → processed/vic-property-sales/house_price_series.parquet
-    convert-unit-price-quarterly   VicGov median unit price XLS → processed/vic-property-sales/unit_price_quarterly.parquet
-    convert-unit-price-series      VicGov unit price annual series XLSX → processed/vic-property-sales/unit_price_series.parquet
+    convert-unit-price-quarterly            VicGov median unit price XLS → processed/vic-property-sales/unit_price_quarterly.parquet
+    convert-unit-price-series               VicGov unit price annual series XLSX → processed/vic-property-sales/unit_price_series.parquet
+    convert-metro-property-price-quarterly  VicGov Melbourne metro quarterly benchmark → processed/vic-property-sales/metro_property_price_quarterly.parquet
+    convert-metro-property-price-series     VicGov Melbourne metro annual series benchmark → processed/vic-property-sales/metro_property_price_series.parquet
     convert-school-zones        School zone SHPs → processed/vic-education/
     convert-seifa            SEIFA XLSX → processed/abs/seifa.parquet
     convert-dffh-rent        DFFH rent XLSX → processed/dffh-rent/rent_moving_annual.parquet
@@ -86,6 +88,14 @@ _COMMANDS = {
         "convert_unit_price_quarterly",
     ),
     "convert-unit-price-series": ("ingestion.convert", "convert_unit_price_series"),
+    "convert-metro-property-price-quarterly": (
+        "ingestion.convert",
+        "convert_metro_property_price_quarterly",
+    ),
+    "convert-metro-property-price-series": (
+        "ingestion.convert",
+        "convert_metro_property_price_series",
+    ),
     "convert-school-zones": ("ingestion.convert", "convert_school_zones"),
     "convert-seifa": ("ingestion.convert", "convert_seifa"),
     "convert-dffh-rent": ("ingestion.convert", "convert_dffh_rent"),

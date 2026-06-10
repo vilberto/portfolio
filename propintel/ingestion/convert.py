@@ -272,6 +272,97 @@ def convert_unit_price_quarterly() -> Path:
     )
 
 
+def convert_metro_property_price_series() -> Path:
+    # Annual filenames sort chronologically as plain strings (year-summary-2024 < year-summary-2025)
+    files = sorted(VIC_PROPERTY_SALES_DIR.glob("year-summary-*.xlsx"))
+    if not files:
+        raise FileNotFoundError(
+            f"No metro annual series file found in {VIC_PROPERTY_SALES_DIR}"
+        )
+    src = files[-1]
+
+    raw = pd.read_excel(src, header=None, engine="openpyxl", keep_default_na=False)
+    col_a = raw.iloc[:, 0].astype(str).str.strip()
+
+    # Locate the table by its two-row title: "Melbourne Metropolitan Area" followed
+    # by "Residential price statistics ..." — position is not guaranteed across files
+    table_start = None
+    for i in range(len(col_a) - 1):
+        if col_a.iloc[i].lower() == "melbourne metropolitan area" and re.search(
+            r"residential price statistics", col_a.iloc[i + 1], re.IGNORECASE
+        ):
+            table_start = i
+            break
+    if table_start is None:
+        raise ValueError(f"Could not locate Melbourne metro table in {src}")
+
+    # 2 title rows + 1 category header + 1 column header = 4 rows before data
+    records = []
+    for _, row in raw.iloc[table_start + 4 :].iterrows():
+        values = [v for v in row if str(v).strip() not in ("", "nan")]
+        if not values:
+            break
+        try:
+            year = int(values[0])
+        except (ValueError, TypeError):
+            break  # footnote or next section title — end of table
+        records.append(
+            {
+                "year": year,
+                "house_median": values[2],
+                "unit_median": values[5],
+            }
+        )
+
+    out = PROCESSED_VIC_PROPERTY_SALES_DIR / "metro_property_price_series.parquet"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(records).to_parquet(out, compression="snappy", index=False)
+    return out
+
+
+_QUARTER_PERIOD_MAP = {"jan-mar": 1, "apr-jun": 2, "jul-sep": 3, "oct-dec": 4}
+
+
+def convert_metro_property_price_quarterly() -> Path:
+    files = sorted(
+        VIC_PROPERTY_SALES_DIR.glob("yearly-summary-q*.xls*"), key=_quarterly_sort_key
+    )
+    if not files:
+        raise FileNotFoundError(
+            f"No metro quarterly benchmark file found in {VIC_PROPERTY_SALES_DIR}"
+        )
+    src = files[-1]
+
+    raw = pd.read_excel(src, header=None, engine="xlrd", keep_default_na=False)
+    col_a = raw.iloc[:, 0].astype(str).str.strip().str.upper()
+    melb_idx = col_a[col_a == "MELBOURNE METROPOLITAN AREA"].index[0]
+    country_idx = col_a[col_a == "COUNTRY VICTORIA"].index[0]
+
+    records = []
+    # Skip 2 header rows after the section anchor; stop before the next section
+    for _, row in raw.iloc[melb_idx + 2 : country_idx].iterrows():
+        # Strip empty cells to handle older file versions with separator columns
+        values = [v for v in row if str(v).strip() not in ("", "nan")]
+        if len(values) < 11:
+            continue
+        period, year = str(values[0]).strip().lower(), str(values[1]).strip()
+        q_num = _QUARTER_PERIOD_MAP.get(period)
+        if q_num is None or not year.isdigit():
+            continue
+        records.append(
+            {
+                "price_quarter": f"{year}-Q{q_num}",
+                "house_median": values[3],
+                "unit_median": values[6],
+            }
+        )
+
+    out = PROCESSED_VIC_PROPERTY_SALES_DIR / "metro_property_price_quarterly.parquet"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(records).to_parquet(out, compression="snappy", index=False)
+    return out
+
+
 def convert_school_zones() -> list[Path]:
     geojson_files = sorted(VIC_EDUCATION_DIR.glob("*Integrated*.geojson"))
     if not geojson_files:
