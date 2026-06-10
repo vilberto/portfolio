@@ -91,3 +91,11 @@ sources:
       - name: planning_overlays
         meta:
           external_location: "read_parquet('../data/processed/vicmap-planning/planning_overlays.parquet')"
+
+      - name: census_g02
+        meta:
+          external_location: "read_csv('../data/raw/abs/census/2021 Census GCP Suburbs and Localities for VIC/2021Census_G02_VIC_SAL.csv')"
+
+      - name: census_g37
+        meta:
+          external_location: "read_csv('../data/raw/abs/census/2021 Census GCP Suburbs and Localities for VIC/2021Census_G37_VIC_SAL.csv')"
