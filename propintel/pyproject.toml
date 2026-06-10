@@ -29,6 +29,9 @@ dev = [
     "pytest>=8",
     "pytest-asyncio>=0.23",
 ]
+analysis = [
+    "rapidfuzz>=3.0",
+]
 
 [tool.setuptools.packages.find]
 where = ["."]

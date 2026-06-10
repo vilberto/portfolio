@@ -1,0 +1,30 @@
+version: 2
+
+seeds:
+  - name: suburb_name_crosswalk
+    description: >
+      Maps source suburb name strings (lowercased, trimmed) to canonical ABS SAL_NAME21 strings.
+      Used in mart joins: lower(trim(stg.suburb_name)) = source_suburb_lower → sal_name → sal_lookup.sal_code.
+      Covers house price quarterly/series, unit price quarterly/series, and auction results.
+      DFFH rent uses a separate seed (dffh_suburb_group_mapping).
+    columns:
+      - name: source_suburb_lower
+        description: Suburb name from source data, lowercased and trimmed. Join key — must match lower(trim(stg.suburb_name)).
+      - name: source
+        description: >
+          Dataset the mapping applies to — 'price' (house/unit price quarterly and series)
+          or 'auction'. Filter on this column in each mart join so that a name mapping
+          valid for auction is not applied to price data and vice versa.
+      - name: sal_name
+        description: Exact ABS SAL_NAME21 string — mixed case, matches sal_lookup.sal_name precisely. Do not lowercase.
+
+  - name: dffh_suburb_group_mapping
+    description: >
+      Maps DFFH suburb group strings to canonical ABS SAL_NAME21 strings.
+      One-to-many: a single suburb_group may map to multiple SAL rows.
+      Group Total rows are excluded — they remain as region benchmarks with sal_code = null in stg_rent.
+    columns:
+      - name: suburb_group
+        description: DFFH suburb group string exactly as it appears in the source data.
+      - name: sal_name
+        description: Exact ABS SAL_NAME21 string — mixed case, matches sal_lookup.sal_name precisely. Do not lowercase.

@@ -1,5 +1,5 @@
 select
-    lower(trim(suburb_name)) as suburb_name,
+    suburb_name,
     price_latest,
     change_pct_1y
 from {{ source('propintel', 'house_price_quarterly') }}

@@ -1,0 +1,41 @@
+source_suburb_lower,in_datasets,auto_match,ambiguous_candidates,fuzzy_candidate,fuzzy_score
+^ means there were fewer than 10 sales for the quarter* means there were no sales for the quarter and the first non-zero figure is carried forwardna means insufficent data was available to create the percentage change,"hpq,upq",,,Moonlight Flat (Central Goldfields),16.535433070866144
+altona east,"hpq,hps,upq,ups",,,Melton West,72.72727272727273
+ascot,auction,,,Bagshot,66.66666666666667
+balcombe,"hpq,hps",,,Seacombe,75.0
+bellfield,auction,,,Campbellfield,81.81818181818181
+cheltenham east,"hpq,hps,upq,ups",,,Cheltenham,72.0
+cheltenham north,"hpq,hps,upq,ups",,,Eltham North,71.42857142857143
+clayton north,"hpq,hps,upq,ups",,,Clayton South,76.92307692307692
+coburg east,"hpq,hps,upq,ups",,,Cobram East,63.63636363636363
+coonans hill,"hpq,hps",,,Bornes Hill,60.86956521739131
+cowes west,"hpq,hps,upq,ups",,,Gorae West,60.0
+fishermans bend,"upq,ups",,,Frenchmans,56.00000000000001
+garden city,"hpq,hps",,,Girgarre,52.63157894736843
+golden point,auction,,,Eagle Point,69.56521739130434
+green lake,"hpq,hps",,,Lake Gardens,63.63636363636363
+hastings west,"hpq,hps",,,Hastings,66.66666666666667
+hidden valley,auction,,,Chiltern Valley,71.42857142857143
+hillside,auction,,,Rippleside,66.66666666666667
+hillside (greater melbourne),hpq,,,Newtown (Greater Geelong),52.83018867924528
+jeeralang north,"hpq,hps",,,North Geelong,71.42857142857143
+jolimont,"hps,upq,ups",,,Belmont,66.66666666666667
+kangaroo ground south,"hpq,hps",,,Kangaroo Ground,72.22222222222221
+kew north,"hpq,hps,upq,ups",,,Newlyn North,66.66666666666667
+lara lake,"hpq,hps,upq,ups",,,Lake Marmal,70.0
+laverton south,"hpq,hps,upq,ups",,,Laverton North,78.57142857142857
+merinda park,"hpq,hps,upq,ups",,,Mena Park,66.66666666666667
+newtown,auction,,,Chewton,71.42857142857143
+osborne,"hpq,hps,upq,ups",,,Gisborne,80.0
+patterson gardens,"hpq,hps",,,Patterson Lakes,75.0
+rosebud south,"hpq,hps,upq,ups",,,Drouin South,64.0
+sanctuary lakes,"hpq,hps,upq,ups,auction",,,Manor Lakes,61.53846153846154
+studfield,"hpq,hps,upq,ups",,,Hadfield,70.58823529411764
+sunnycliffs,"hpq,hps",,,Queenscliff,63.63636363636363
+syndal,"hpq,hps,upq,ups",,,Aspendale,66.66666666666667
+thomson,auction,,,Glenthompson,73.6842105263158
+wallan east,"hpq,hps,upq,ups",,,Kialla East,72.72727272727273
+wendouree west,"hpq,hps",,,Wendouree,69.56521739130434
+westall,"hpq,hps,upq,ups",,,Kirkstall,62.5
+westgarth,"hpq,hps,upq,ups",,,Research,58.82352941176471
+woolamai waters,"hpq,hps",,,Cape Woolamai,71.42857142857143

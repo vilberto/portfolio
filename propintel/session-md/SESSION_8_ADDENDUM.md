@@ -327,6 +327,16 @@ Cost: ~$1.50 across ~550 Melbourne suburbs. Generate once, serve statically.
 - Mart column lists in this doc are directional, not final. Final columns emerge
   from data inspection. Do not treat the plan as the spec.
 
+## Crosswalk analysis still needed
+
+- **Auction results** — `stg_auction_results.suburb` column; run
+  `analysis/suburb_crosswalk_analysis.py`-style mismatch query and add any
+  valid entries to `seeds/suburb_name_crosswalk.csv`
+- **VCAA SSCAI** — `stg_vcaa_sscai` school name + locality; needs
+  `seeds/school_name_crosswalk.csv` populated (vcaa_school + vcaa_locality →
+  acara_school_name). Separate seed from suburb crosswalk. Build after both
+  staging models exist — see school name crosswalk section above.
+
 ## Carry-forwards (out of Session 8 scope)
 
 - `transit_mart` — if time-constrained after priority marts
