@@ -31,6 +31,8 @@ from ingestion.config import (
     VIC_EDUCATION_DIR,
     VIC_PROPERTY_SALES_DIR,
     VCAA_SSCAI_DIR,
+    VICMAP_PLANNING_RAW_DIR,
+    VICMAP_PLANNING_PROCESSED_DIR,
 )
 
 _SEIFA_SHEETS = [
@@ -696,3 +698,97 @@ def convert_vcaa_sscai() -> Path:
     out.parent.mkdir(parents=True, exist_ok=True)
     result.to_parquet(out, index=False)
     return out
+
+
+# ---------------------------------------------------------------------------
+# Vicmap Planning
+# ---------------------------------------------------------------------------
+
+_VICMAP_METRO_LGAS = {
+    "BANYULE",
+    "BAYSIDE",
+    "BOROONDARA",
+    "BRIMBANK",
+    "CARDINIA",
+    "CASEY",
+    "DAREBIN",
+    "FRANKSTON",
+    "GLEN EIRA",
+    "GREATER DANDENONG",
+    "HOBSONS BAY",
+    "HUME",
+    "KINGSTON",
+    "KNOX",
+    "MANNINGHAM",
+    "MARIBYRNONG",
+    "MAROONDAH",
+    "MELBOURNE",
+    "MELTON",
+    "MERRI-BEK",
+    "MONASH",
+    "MOONEE VALLEY",
+    "MORNINGTON PENINSULA",
+    "NILLUMBIK",
+    "PORT PHILLIP",
+    "STONNINGTON",
+    "WHITEHORSE",
+    "WHITTLESEA",
+    "WYNDHAM",
+    "YARRA",
+    "YARRA RANGES",
+}
+
+_VICMAP_KEEP_COLS = [
+    "PFI",
+    "LGA_CODE",
+    "LGA",
+    "ZONE_NUM",
+    "ZONE_CODE",
+    "ZONE_DESC",
+    "CODEPARENT",
+    "ZNCODEGRP",
+    "ZNCODEGRPL",
+    "GAZ_B_DATE",
+    "UFI",
+]
+
+_VICMAP_RENAME = {
+    "PFI": "pfi",
+    "LGA_CODE": "lga_code",
+    "LGA": "lga",
+    "ZONE_NUM": "zone_num",
+    "ZONE_CODE": "zone_code",
+    "ZONE_DESC": "zone_desc",
+    "CODEPARENT": "code_parent",
+    "ZNCODEGRP": "zncodegrp",
+    "ZNCODEGRPL": "zncodegrpl",
+    "GAZ_B_DATE": "gaz_b_date",
+    "UFI": "ufi",
+}
+
+_VICMAP_ZONES_SHP = (
+    VICMAP_PLANNING_RAW_DIR
+    / "PLAN_ZONE_CODELIST/ll_gda2020/esrishape/whole_of_dataset/victoria/VMPLAN/PLAN_ZONE_CODELIST.shp"
+)
+_VICMAP_OVERLAYS_SHP = (
+    VICMAP_PLANNING_RAW_DIR
+    / "PLAN_OVERLAY_CODELIST/ll_gda2020/esrishape/whole_of_dataset/victoria/VMPLAN/PLAN_OVERLAY_CODELIST.shp"
+)
+
+
+def _convert_vicmap_shp(shp_path: Path, out_path: Path) -> None:
+    gdf = gpd.read_file(shp_path)
+    gdf = gdf[gdf["LGA"].isin(_VICMAP_METRO_LGAS)]
+    gdf = gdf[_VICMAP_KEEP_COLS + ["geometry"]]
+    gdf = gdf.rename(columns=_VICMAP_RENAME)
+    gdf = gdf.to_crs(epsg=4326)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    gdf.to_parquet(out_path, index=False)
+
+
+def convert_vicmap_planning() -> tuple[Path, Path]:
+    zones_out = VICMAP_PLANNING_PROCESSED_DIR / "planning_zones.parquet"
+    overlays_out = VICMAP_PLANNING_PROCESSED_DIR / "planning_overlays.parquet"
+    _convert_vicmap_shp(_VICMAP_ZONES_SHP, zones_out)
+    _convert_vicmap_shp(_VICMAP_OVERLAYS_SHP, overlays_out)
+    return zones_out, overlays_out

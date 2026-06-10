@@ -33,6 +33,7 @@ Convert commands:
     convert-acara-location   ACARA school location XLSX → processed/acara-school/school_location.parquet
     convert-acara-profile    ACARA school profile XLSX → processed/acara-school/school_profile.parquet
     convert-vcaa-sscai       VCAA SSCAI all years → processed/vcaa-sscai/vcaa_sscai.parquet
+    convert-vicmap-planning  Vicmap planning zones + overlays SHP → processed/vicmap-planning/
 
 Group commands:
     abs           abs-seifa, abs-census, abs-sal-boundary
@@ -103,6 +104,7 @@ _COMMANDS = {
     "convert-acara-location": ("ingestion.convert", "convert_acara_school_location"),
     "convert-acara-profile": ("ingestion.convert", "convert_acara_school_profile"),
     "convert-vcaa-sscai": ("ingestion.convert", "convert_vcaa_sscai"),
+    "convert-vicmap-planning": ("ingestion.convert", "convert_vicmap_planning"),
 }
 
 _CONVERT_MVP = [
