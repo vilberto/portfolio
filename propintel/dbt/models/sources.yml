@@ -83,3 +83,11 @@ sources:
       - name: vcaa_sscai
         meta:
           external_location: "read_parquet('../data/processed/vcaa-sscai/vcaa_sscai.parquet')"
+
+      - name: planning_zones
+        meta:
+          external_location: "read_parquet('../data/processed/vicmap-planning/planning_zones.parquet')"
+
+      - name: planning_overlays
+        meta:
+          external_location: "read_parquet('../data/processed/vicmap-planning/planning_overlays.parquet')"
