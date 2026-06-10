@@ -121,9 +121,28 @@ Both share the same schema: `PFI`, `SCHEMECODE`, `LGA_CODE`, `LGA`, `ZONE_NUM`,
 `ZNCODEGRPL`, `PFI_CR`, `UFI`, `UFI_CR` + geometry.
 
 Convert: filter to Melbourne metro LGAs via the `LGA` column (avoids spatial join),
-reproject GDA2020 → EPSG:4326. Retain: `LGA_CODE`, `LGA`, `ZONE_CODE`, `ZONE_DESC`,
-`ZNCODEGRP`, `ZNCODEGRPL`, `ZONESTATUS` + geometry. Inspect distinct `LGA` values
-before hardcoding the Melbourne metro filter list.
+reproject GDA2020 → EPSG:4326.
+
+Columns kept (snake_case in parquet): `pfi`, `lga_code`, `lga`, `zone_num`,
+`zone_code`, `zone_desc`, `code_parent`, `zncodegrp`, `zncodegrpl`, `gaz_b_date`,
+`ufi` + geometry.
+
+Dropped: `SCHEMECODE` (always `ZN` for zones; equals `CODEPARENT` for overlays —
+redundant in both), `ZONESTATUS` (always `'g'` across all 226k rows — constant),
+`PFI_CR`, `UFI_CR` (internal audit metadata). `UFI` retained — may be useful for
+future joins to VicMap Address / VicMap Property.
+
+`CODEPARENT` vs `ZNCODEGRP`: not always equal. For zones, they differ on `PUZ`
+and `TRZ` (ZNCODEGRP = schedule-specific code, CODEPARENT = parent type). For
+overlays, they differ on `PSB` (→ UGB) and `RFO` (→ FO). Both retained.
+
+Melbourne metro LGA filter (31 LGAs): BANYULE, BAYSIDE, BOROONDARA, BRIMBANK,
+CARDINIA, CASEY, DAREBIN, FRANKSTON, GLEN EIRA, GREATER DANDENONG, HOBSONS BAY,
+HUME, KINGSTON, KNOX, MANNINGHAM, MARIBYRNONG, MAROONDAH, MELBOURNE, MELTON,
+MERRI-BEK, MONASH, MOONEE VALLEY, MORNINGTON PENINSULA, NILLUMBIK, PORT PHILLIP,
+STONNINGTON, WHITEHORSE, WHITTLESEA, WYNDHAM, YARRA, YARRA RANGES.
+MITCHELL excluded (only fringe area is metro). PORT OF MELBOURNE excluded (port
+authority area, not an LGA).
 
 Before `convert_vcaa_sscai`: inspect all four XLSX files. Document schema per
 year. Union model uses only columns consistent across all years.
@@ -147,10 +166,10 @@ run.py additions:
 | `stg_acara_school_profile` | school_profile.parquet | ICSEA, enrolment, student-teacher ratio |
 | `stg_acara_school_location` | school_location.parquet | lat/lng per school |
 | `stg_vcaa_sscai` | sscai_*.parquet | Union across years; consistent cols only |
-| `stg_census` | raw/abs/census/*.csv | Income, age, household size, dwelling type — external CSV sources, no conversion |
+| `stg_census` | raw/abs/census/G02 + G37 | Joins G02 (`Median_tot_hhd_inc_weekly` → `median_hhd_inc_weekly`) and G37 (`O_OR_Total` → `owned_outright_total`, `O_MTG_Total` → `owned_mortgage_total`, `R_Tot_Total` → `rented_total`) on `SAL_CODE_2021`. No format conversion — CSVs declared as external sources. `pct_owned` and `pct_rented` are derived metrics — deferred to mart, not staging. |
 | `stg_auction_results` | raw/auction/*.csv | Per-auction CSV; glob reads all weekly files; dedup by `(domain_id, week_ending)` keeping latest `scraped_at`. AUPP ("Passed In Prior") is Domain's "Postponed" — excluded from clearance rate denominator. Clearance rate formula: `count(Sold + Sold Prior) / count(all except Passed In Prior)`. Validated against Domain adjClearanceRate — within ~1pp. |
-| `stg_planning_zones` | zones.parquet | Column selection; inspect ZONESTATUS values before adding any filter |
-| `stg_planning_overlays` | overlays.parquet | Same pattern as stg_planning_zones |
+| `stg_planning_zones` | zones.parquet | Column selection only — all columns from convert are kept as-is (ZONESTATUS already dropped in convert, always `'g'`). |
+| `stg_planning_overlays` | overlays.parquet | Same pattern as stg_planning_zones. |
 
 Convert functions output their natural shape (minimal transformation). Staging
 models own the unioning, normalisation, filtering, and column selection — not
