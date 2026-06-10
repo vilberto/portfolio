@@ -224,8 +224,13 @@ def convert_sal_lookup() -> Path:
     return out
 
 
+def _quarterly_sort_key(p: Path) -> tuple[int, int]:
+    m = re.search(r"q(\d)-(\d{4})", p.stem)
+    return (int(m.group(2)), int(m.group(1))) if m else (0, 0)
+
+
 def _convert_price_quarterly(glob_pattern: str, out_name: str) -> Path:
-    files = sorted(VIC_PROPERTY_SALES_DIR.glob(glob_pattern))
+    files = sorted(VIC_PROPERTY_SALES_DIR.glob(glob_pattern), key=_quarterly_sort_key)
     if not files:
         raise FileNotFoundError(
             f"No file matching '{glob_pattern}' found in {VIC_PROPERTY_SALES_DIR}"
