@@ -79,3 +79,7 @@ sources:
       - name: acara_school_profile
         meta:
           external_location: "read_parquet('../data/processed/acara-school/school_profile.parquet')"
+
+      - name: vcaa_sscai
+        meta:
+          external_location: "read_parquet('../data/processed/vcaa-sscai/vcaa_sscai.parquet')"

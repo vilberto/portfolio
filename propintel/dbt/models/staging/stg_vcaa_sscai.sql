@@ -1,0 +1,20 @@
+select
+    year,
+    school,
+    locality,
+    is_small_school,
+    ib_available,
+    vce_study_count,
+    vet_cert_count,
+    hes_study_count,
+    vce_enrolments,
+    vet_enrolments,
+    hes_enrolments,
+    pct_tertiary_applicants,
+    pct_satisfactory_completions,
+    vce_baccalaureate_count,
+    pct_vet_competency_completions,
+    pct_hes_completions,
+    vce_median_study_score,
+    pct_study_score_40_plus
+from {{ source('propintel', 'vcaa_sscai') }}

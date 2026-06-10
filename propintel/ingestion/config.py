@@ -29,6 +29,7 @@ PROCESSED_DFFH_DIR = PROCESSED_DIR / "dffh-rent"
 PROCESSED_ACARA_DIR = PROCESSED_DIR / "acara-school"
 PROCESSED_VIC_PROPERTY_SALES_DIR = PROCESSED_DIR / "vic-property-sales"
 PROCESSED_VIC_EDUCATION_DIR = PROCESSED_DIR / "vic-education"
+PROCESSED_VCAA_DIR = PROCESSED_DIR / "vcaa-sscai"
 
 # --- ABS ---
 # Stable URL — updates every 5 years aligned to Census cycle

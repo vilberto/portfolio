@@ -32,6 +32,7 @@ Convert commands:
     convert-dffh-rent        DFFH rent XLSX → processed/dffh-rent/rent_moving_annual.parquet
     convert-acara-location   ACARA school location XLSX → processed/acara-school/school_location.parquet
     convert-acara-profile    ACARA school profile XLSX → processed/acara-school/school_profile.parquet
+    convert-vcaa-sscai       VCAA SSCAI all years → processed/vcaa-sscai/vcaa_sscai.parquet
 
 Group commands:
     abs           abs-seifa, abs-census, abs-sal-boundary
@@ -101,6 +102,7 @@ _COMMANDS = {
     "convert-dffh-rent": ("ingestion.convert", "convert_dffh_rent"),
     "convert-acara-location": ("ingestion.convert", "convert_acara_school_location"),
     "convert-acara-profile": ("ingestion.convert", "convert_acara_school_profile"),
+    "convert-vcaa-sscai": ("ingestion.convert", "convert_vcaa_sscai"),
 }
 
 _CONVERT_MVP = [

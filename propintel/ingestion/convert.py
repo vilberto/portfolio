@@ -25,10 +25,12 @@ from ingestion.config import (
     PROCESSED_ACARA_DIR,
     PROCESSED_ABS_DIR,
     PROCESSED_DFFH_DIR,
+    PROCESSED_VCAA_DIR,
     PROCESSED_VIC_EDUCATION_DIR,
     PROCESSED_VIC_PROPERTY_SALES_DIR,
     VIC_EDUCATION_DIR,
     VIC_PROPERTY_SALES_DIR,
+    VCAA_SSCAI_DIR,
 )
 
 _SEIFA_SHEETS = [
@@ -564,4 +566,133 @@ def convert_acara_school_profile() -> Path:
     out = PROCESSED_ACARA_DIR / "school_profile.parquet"
     out.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(out, compression="snappy", index=False)
+    return out
+
+
+# ---------------------------------------------------------------------------
+# VCAA SSCAI
+# ---------------------------------------------------------------------------
+
+_VCAA_NAMES_EX_HES = [
+    "school",
+    "is_small_school",
+    "locality",
+    "vce_study_count",
+    "vet_cert_count",
+    "ib_available",
+    "vce_enrolments",
+    "vet_enrolments",
+    "pct_tertiary_applicants",
+    "pct_satisfactory_completions",
+    "vce_baccalaureate_count",
+    "pct_vet_competency_completions",
+    "vce_median_study_score",
+    "pct_study_score_40_plus",
+]
+
+# HES columns slot in at the same relative positions across 2023-2025:
+# after vet_cert_count, after vet_enrolments, after pct_vet_competency_completions
+_VCAA_HES_COLS = ["hes_study_count", "hes_enrolments", "pct_hes_completions"]
+
+_VCAA_NAMES_WITH_HES = (
+    _VCAA_NAMES_EX_HES[:5]
+    + [_VCAA_HES_COLS[0]]
+    + _VCAA_NAMES_EX_HES[5:8]
+    + [_VCAA_HES_COLS[1]]
+    + _VCAA_NAMES_EX_HES[8:12]
+    + [_VCAA_HES_COLS[2]]
+    + _VCAA_NAMES_EX_HES[12:]
+)
+
+# Per-year config: skiprows includes the header row (header=None used throughout).
+# usecols are 0-indexed Excel column positions in ascending order.
+_VCAA_YEAR_CONFIG: dict[int, dict] = {
+    2022: {
+        "skiprows": 9,
+        "usecols": [0, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 15, 16],
+        "names": _VCAA_NAMES_EX_HES,
+        "strip_repeated_headers": False,
+    },
+    2023: {
+        "skiprows": 11,
+        "usecols": [0, 1, 2, 3, 4, 5, 8, 10, 11, 13, 14, 16, 18, 19, 20, 21, 22],
+        "names": _VCAA_NAMES_WITH_HES,
+        "strip_repeated_headers": False,
+    },
+    2024: {
+        "skiprows": 11,
+        "usecols": [0, 1, 2, 3, 4, 5, 8, 10, 11, 13, 14, 15, 17, 18, 19, 20, 21],
+        "names": _VCAA_NAMES_WITH_HES,
+        "strip_repeated_headers": True,
+    },
+    2025: {
+        "skiprows": 12,
+        "usecols": [0, 1, 2, 3, 4, 5, 8, 10, 11, 13, 14, 15, 17, 18, 19, 20, 21],
+        "names": _VCAA_NAMES_WITH_HES,
+        "strip_repeated_headers": False,
+    },
+}
+
+_VCAA_NUMERIC_COLS = [
+    "vce_study_count",
+    "vet_cert_count",
+    "hes_study_count",
+    "vce_enrolments",
+    "vet_enrolments",
+    "hes_enrolments",
+    "pct_tertiary_applicants",
+    "pct_satisfactory_completions",
+    "vce_baccalaureate_count",
+    "pct_vet_competency_completions",
+    "pct_hes_completions",
+    "vce_median_study_score",
+    "pct_study_score_40_plus",
+]
+
+_VCAA_CANONICAL_COLS = ["year"] + _VCAA_NAMES_WITH_HES
+
+
+def convert_vcaa_sscai() -> Path:
+    frames = []
+    for year, cfg in _VCAA_YEAR_CONFIG.items():
+        path = VCAA_SSCAI_DIR / f"sscai_{year}.xlsx"
+        if not path.exists():
+            raise FileNotFoundError(f"VCAA SSCAI file not found: {path}")
+
+        df = pd.read_excel(
+            path,
+            header=None,
+            skiprows=cfg["skiprows"],
+            usecols=cfg["usecols"],
+            dtype=str,
+            keep_default_na=False,
+            engine="openpyxl",
+        )
+        # header=None preserves original integer column indices; map to canonical names
+        df = df.rename(columns=dict(zip(cfg["usecols"], cfg["names"])))
+
+        if cfg["strip_repeated_headers"]:
+            df = df[df["school"] != "School"]
+
+        df = df[df["school"].str.strip() != ""]
+
+        df["is_small_school"] = df["is_small_school"].str.strip() == "*"
+        df["ib_available"] = df["ib_available"].str.strip() == "Y"
+
+        for col in _VCAA_NUMERIC_COLS:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors="coerce")
+
+        for col in _VCAA_HES_COLS:
+            if col not in df.columns:
+                df[col] = pd.NA
+
+        df["year"] = year
+        frames.append(df[_VCAA_CANONICAL_COLS])
+
+    result = pd.concat(frames, ignore_index=True)
+
+    out = PROCESSED_VCAA_DIR / "vcaa_sscai.parquet"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    result.to_parquet(out, index=False)
     return out
