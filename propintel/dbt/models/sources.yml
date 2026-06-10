@@ -99,3 +99,7 @@ sources:
       - name: census_g37
         meta:
           external_location: "read_csv('../data/raw/abs/census/2021 Census GCP Suburbs and Localities for VIC/2021Census_G37_VIC_SAL.csv')"
+
+      - name: auction_results_raw
+        meta:
+          external_location: "read_csv('../data/raw/auction/results_*.csv')"
