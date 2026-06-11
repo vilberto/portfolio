@@ -1,0 +1,218 @@
+vcaa_school,vcaa_locality,case_type,exact_acara_name,fuzzy_candidate,fuzzy_score,acara_school_name,need_locality
+adass israel school,east st kilda,duplicate,Adass Israel School,,,
+adass israel school,elsternwick,duplicate,Adass Israel School,,,y
+bacchus marsh grammar,aintree,duplicate,Bacchus Marsh Grammar,,,
+bacchus marsh grammar,bacchus marsh,duplicate,Bacchus Marsh Grammar,,,y
+beaconhills college,berwick,duplicate,Beaconhills College,,,
+beaconhills college,pakenham,duplicate,Beaconhills College,,,y
+caulfield grammar school,st kilda east,duplicate,Caulfield Grammar School,,,y
+caulfield grammar school,wheelers hill,duplicate,Caulfield Grammar School,,,
+chairo christian school,drouin,duplicate,Chairo Christian School,,,y
+chairo christian school,leongatha,duplicate,Chairo Christian School,,,
+chairo christian school,nar nar goon,duplicate,Chairo Christian School,,,
+charles la trobe p-12 college,macleod west,duplicate,Charles La Trobe P-12 College,,,y
+charles la trobe p-12 college,preston,duplicate,Charles La Trobe P-12 College,,,
+cire community school,lilydale,duplicate,Cire Community School,,,y
+cire community school,yarra junction,duplicate,Cire Community School,,,
+collingwood college,collingwood,duplicate,Collingwood College,,,y
+collingwood college,fitzroy north,duplicate,Collingwood College,,,
+emmanuel college,altona north,duplicate,Emmanuel College,,,Emmanuel College
+emmanuel college,warrnambool,duplicate,Emmanuel College,,,Emmanuel College Warrnambool
+gilson college,mernda,duplicate,Gilson College,,,
+gilson college,taylors hill,duplicate,Gilson College,,,y
+heathdale christian college,melton,duplicate,Heathdale Christian College,,,
+heathdale christian college,werribee,duplicate,Heathdale Christian College,,,y
+heritage college,ferntree gully,duplicate,Heritage College,,,Heritage College Knox
+heritage college,officer,duplicate,Heritage College,,,Heritage College
+hester hornbrook academy,melbourne,duplicate,Hester Hornbrook Academy,,,y
+hester hornbrook academy,south melbourne,duplicate,Hester Hornbrook Academy,,,
+ilim college,broadmeadows,duplicate,Ilim College,,,y
+ilim college,doveton,duplicate,Ilim College,,,
+ivanhoe grammar school,ivanhoe,duplicate,Ivanhoe Grammar School,,,y
+ivanhoe grammar school,mernda,duplicate,Ivanhoe Grammar School,,,
+lighthouse christian college,cranbourne,duplicate,Lighthouse Christian College,,,Lighthouse Christian College Cranbourne
+lighthouse christian college,keysborough,duplicate,Lighthouse Christian College,,,Lighthouse Christian College
+minaret college,officer,duplicate,Minaret College,,,
+minaret college,springvale,duplicate,Minaret College,,,y
+plenty river college,greensborough,duplicate,Plenty River College,,,
+plenty river college,south morang,duplicate,Plenty River College,,,y
+simonds catholic college,fitzroy north,duplicate,Simonds Catholic College,,,
+simonds catholic college,west melbourne,duplicate,Simonds Catholic College,,,y
+st joseph's college,echuca,duplicate,St Joseph's College,,,St Joseph's College - Brigidine Campus
+st joseph's college,ferntree gully,duplicate,St Joseph's College,,,St Joseph's College
+st joseph's college,mildura,duplicate,St Joseph's College,,,St Joseph's College Mildura
+st joseph's college,newtown,duplicate,St Joseph's College,,,St Joseph's College Geelong
+village high school,ryanston,duplicate,Village High School,,,y
+village high school,wonthaggi,duplicate,Village High School,,,
+waverley christian college,narre warren south,duplicate,Waverley Christian College,,,
+waverley christian college,wantirna south,duplicate,Waverley Christian College,,,y
+wesley college,glen waverley,duplicate,Wesley College,,,
+wesley college,melbourne,duplicate,Wesley College,,,y
+advance college of education,rosebud west,no_match,,Advance College of Education Incorporated,72.5,y
+australian internatl academy,caroline springs,no_match,,Australian International Academy of Education,71.2,
+australian internatl academy,coburg,no_match,,Australian International Academy of Education,71.2,y
+balmoral k-12 comm college,balmoral,no_match,,Balmoral K-12 Community College,77.2,y
+belgrave heights christian schl,belgrave heights,no_match,,Belgrave Heights Christian School,84.4,y
+bendigo senior sec college,bendigo,no_match,,Bendigo Senior Secondary College,75.9,y
+bendigo south east 7-10 sc,bendigo,no_match,,Bendigo South East 7-10 Secondary College,68.7,y
+berry street victoria,sebastopol,no_match,,Mastery Schools Victoria,57.8,
+berwick grammar school,officer,no_match,,Berwick Primary School,77.3,
+box hill institute,box hill,no_match,,Holy Trinity School,48.6,
+box hill institute - cae campus,melbourne,no_match,,St James the Apostle School,44.8,
+box hill senior sec college,mont albert north,no_match,,Box Hill Senior Secondary College,73.3,y
+brauer college,warrnambool,no_match,,Braemar College,75.9,Brauer Secondary College
+camberwell anglican girls gs,canterbury,no_match,,Camberwell Girls Grammar School,50.8,y
+canterbury girls sec college,canterbury,no_match,,Canterbury Girls Secondary College,77.4,y
+caroline chisholm catholic coll,braybrook,no_match,,Caroline Chisholm Catholic College,83.1,y
+carrum downs sec college,carrum downs,no_match,,Carrum Downs Secondary College,74.1,y
+cathedral college,wangaratta,no_match,,Cathedral College Wangaratta,66.7,y
+catholic ladies college,eltham,no_match,,Catholic Ladies' College Ltd,78.4,y
+catholic regional college,caroline springs,no_match,,Penola Catholic College,75.0,Catholic Regional College Caroline Springs
+catholic regional college,keilor north,no_match,,Penola Catholic College,75.0,Catholic Regional College North Keilor
+catholic regional college,melton west,no_match,,Penola Catholic College,75.0,St Francis Catholic College
+catholic regional college,st albans,no_match,,Penola Catholic College,75.0,Catholic Regional College St Albans
+catholic regional college,sydenham,no_match,,Penola Catholic College,75.0,Catholic Regional College Sydenham
+chisholm institute,frankston,no_match,,St Simon's School,51.4,
+christian college institute,waurn ponds,no_match,,Lighthouse Christian College,72.7,
+community college gippsland,warragul,no_match,,Julia Gillard Community College,69.0,
+cranbourne east sec college,cranbourne east,no_match,,Cranbourne East Secondary College,76.7,y
+cranbourne west sec college,cranbourne west,no_match,,Cranbourne West Secondary College,76.7,y
+derrinallum p12 college,derrinallum,no_match,,Derrinallum P-12 College,85.1,y
+dimboola memorial sec college,dimboola,no_match,,Dimboola Memorial Secondary College,78.1,y
+djerriwarrh community college,melton,no_match,,Murrayville Community College,65.5,Djerriwarrh Community & Education Services - Djerriwarrh Community College
+east doncaster sec college,doncaster east,no_match,,East Doncaster Secondary College,75.9,y
+f.c.j. college,benalla,no_match,,Mercy College,59.3,FCJ College
+fintona girls school,balwyn,no_match,,Fintona Girls' School,82.9,y
+flinders christian comm college,carrum downs,no_match,,Flinders Christian Community College,80.6,
+flinders christian comm college,tyabb,no_match,,Flinders Christian Community College,80.6,y
+foundation college,frankston,no_match,,Kurnai College,68.8,
+foundation college,narre warren,no_match,,Kurnai College,68.8,Foundation Learning Centre
+fountain gate sec college,fountain gate,no_match,,Fountain Gate Secondary College,75.0,y
+galen college,wangaratta,no_match,,Sale College,80.0,Galen Catholic College
+genazzano f.c.j. college,kew,no_match,,Genazzano FCJ College,71.1,y
+gladstone park sec college,gladstone park,no_match,,Gladstone Park Secondary College,75.9,y
+glen waverley sec college,glen waverley,no_match,,Glen Waverley Secondary College,75.0,y
+glenroy secondary college,glenroy,no_match,,Edenbrook Secondary College,76.9,Glenroy College
+good shepherd college,hamilton,no_match,,Good Shepherd College - Senior Campus,62.1,y
+goulburn valley grammar schl,shepparton,no_match,,Goulburn Valley Grammar School,82.8,y
+greater shepparton sec college,shepparton,no_match,,Greater Shepparton Secondary College,78.8,y
+greensborough sec college,greensborough,no_match,,Greensborough Secondary College,78.6,y
+haileybury - pangea campus,keysborough,no_match,,Sale Campus,48.6,
+haileybury girls college,keysborough,no_match,,Haileybury College,76.2,
+haileybury rendall school,berrimah,no_match,,Berendale School,63.4,
+hallam senior sec college,hallam,no_match,,Hallam Secondary College,69.4,y
+hampton park sec college,hampton park,no_match,,Hampton Park Secondary College,74.1,y
+hawkesdale college,hawkesdale,no_match,,Hawkesdale P12 College,80.0,y
+heatherton christian college,clarinda,no_match,,Shepparton Christian College,82.1,Christway College
+heywood & district sec college,heywood,no_match,,Heywood District Secondary College,75.0,y
+highview christian comm college,maryborough,no_match,,Olivet Christian College,69.1,Highview College
+holmesglen institute,moorabbin,no_match,,Sunshine College,55.6,
+homestead senior sec college,point cook,no_match,,Homestead Senior Secondary College,77.4,y
+hoppers crossing sec college,hoppers crossing,no_match,,Hoppers Crossing Secondary College,77.4,y
+hume central sec college,broadmeadows,no_match,,Hume Central Secondary College,74.1,y
+ilim college kiewa campus,dallas,no_match,,Swan Hill College,57.1,
+john fawkner college,fawkner,no_match,,Fawkner Secondary College,71.1,John Fawkner Secondary College
+kaniva p-12 college,kaniva,no_match,,Kaniva College,72.7,y
+kardinia internatl college,bell post hill,no_match,,Kardinia International College,82.1,y
+keilor downs college,keilor downs,no_match,,Essendon Keilor College,74.4,Keilor Downs Secondary College
+kensington comm high school,kensington,no_match,,Kensington Community High School,78.0,y
+keysborough sc - acacia,keysborough,no_match,,Maryborough Education Centre,51.0,
+keysborough sc - banksia,springvale south,no_match,,Keysborough Gardens Primary School,55.2,Keysborough Secondary College
+kings college,warrnambool,no_match,,King's College,81.5,y
+koo wee rup sec college,koo wee rup,no_match,,Koo Wee Rup Secondary College,69.2,y
+korumburra sec college,korumburra,no_match,,Korumburra Secondary College,76.0,y
+kyneton secondary college,kyneton,no_match,,Melton Secondary College,81.6,Kyneton High School
+lakes entrance sec college,lakes entrance,no_match,,Lakes Entrance Secondary College,75.9,y
+lakeside lutheran college,pakenham,no_match,,Geelong Lutheran College,69.4,Lakeside College
+lalor north sec college,epping,no_match,,Lalor North Secondary College,73.1,y
+lauriston girls school,armadale,no_match,,Lauriston Girls' School,84.4,y
+lowther hall anglican gs,essendon,no_match,,Lowther Hall Anglican Grammar School,63.3,y
+lynall hall community school,richmond,no_match,,Croydon Community School,65.4,Bindjiroo Yaluk Community School
+mac.robertson girls' high schl,melbourne,no_match,,MacRobertson Girls High School,76.7,y
+mackillop catholic reg college,werribee,no_match,,MacKillop Catholic Regional College,76.9,y
+marian college ararat,ararat,no_match,,Marian College,68.6,Marian College,y
+marian college myrtleford,myrtleford,no_match,,Myrtleford P-12 College,66.7,Marian College,y
+marian college sunshine,sunshine west,no_match,,Sunshine College,71.8,Marian College,y
+maribyrnong sec college,maribyrnong,no_match,,Maribyrnong College,81.0,y
+marist - sion college,warragul,no_match,,Marist-Sion College,75.0,y
+mary mackillop catholic college,leongatha,no_match,,Mary MacKillop Catholic Regional College,73.2,y
+mary mackillop catholic regional coll,leongatha,no_match,,Mary MacKillop Catholic Regional College,80.5,y
+matthew flinders girls' sc,geelong,no_match,,Matthew Flinders Girls Secondary College,63.6,y
+melba college,croydon,no_match,,Kambrya College,71.4,Melba Secondary College
+melbourne girls' college,richmond,no_match,,Melbourne Girls College,85.1,y
+melbourne rudolf steiner schl,warranwood,no_match,,Melbourne Rudolf Steiner School,83.3,y
+mentone girls' sec college,mentone,no_match,,Mentone Girls Secondary College,73.7,y
+methodist ladies college,kew,no_match,,Methodist Ladies' College,85.7,y
+mirboo north sec college,mirboo north,no_match,,Mirboo North Secondary College,74.1,y
+montmorency sec college,montmorency,no_match,,Montmorency Secondary College,76.9,y
+mortlake college,mortlake,no_match,,Mortlake P-12 College,75.7,y
+mount alexander 7-12 coll,flemington,no_match,,Mount Alexander 7-12 College,83.0,y
+mount beauty sec college,mount beauty,no_match,,Mount Beauty Secondary College,74.1,y
+mount eliza sec college,mount eliza,no_match,,Mount Eliza Secondary College,73.1,y
+mount erin college,frankston south,no_match,,Heathmont College,68.6,Mount Erin Secondary College
+mount waverley sec college,mount waverley,no_match,,Mount Waverley Secondary College,75.9,y
+mountain district christian sc,monbulk,no_match,,Mountain District Christian School,81.2,
+mountain district comm college,boronia,no_match,,Neerim District Secondary College,60.3,
+mountain district comm college,ferntree gully,no_match,,Neerim District Secondary College,60.3,
+mullauna college,mitcham,no_match,,Padua College,69.0,Mullauna Secondary College
+murtoa p-12 college,murtoa,no_match,,Murtoa College,72.7,y
+narre warren sth p-12 college,narre warren south,no_match,,Narre Warren South P-12 College,80.0,y
+neerim district sec college,neerim south,no_match,,Neerim District Secondary College,76.7,y
+north geelong sec college,geelong north,no_match,,North Geelong Secondary College,75.0,y
+north geelong sec college,north geelong,no_match,,North Geelong Secondary College,75.0,y
+northern college of arts & tech,preston east,no_match,,Northern College of the Arts and Technology,64.9,y
+nunawading christian college,nunawading,no_match,,Nunawading Christian College - Primary,75.8,Nunawading Christian College - Secondary
+orbost secondary college,orbost,no_match,,Foster Secondary College,79.2,Orbost Community College
+our lady of sacred heart coll,bentleigh,no_match,,Our Lady of the Sacred Heart College,64.6,y
+overnewton anglican comm coll,keilor,no_match,,Overnewton Anglican Community College,75.8,y
+pascoe vale girls sec college,pascoe vale,no_match,,Pascoe Vale Girls Secondary College,75.0,y
+patterson river sec college,carrum,no_match,,Patterson River Secondary College,76.7,
+patterson river sec college,seaford,no_match,,Patterson River Secondary College,76.7,y
+penleigh & essendon grammar,keilor east,no_match,,Penleigh & Essendon Grammar School,78.7,y
+phoenix p-12 comm coll,sebastopol,no_match,,Phoenix P-12 Community College,69.2,y
+point cook senior sec college,point cook,no_match,,Point Cook Senior Secondary College,75.0,y
+prace college,reservoir,no_match,,Parade College,74.1,Preston Reservoir Adult Community Education - Prace College campus
+preshil the margaret lyttle ms,kew,no_match,,"Preshil, The Margaret Lyttle Memorial School",67.6,y
+preston reservoir ace,reservoir,no_match,,Reservoir East Primary School,52.0,Preston Reservoir Adult Community Education - Prace College campus
+princes hill sec college,princes hill,no_match,,Princes Hill Secondary College,74.1,y
+sacred heart college geelong,newtown,no_match,,Sacred Heart College,70.8,y,y
+sacred heart college kyneton,kyneton,no_match,,Sacred Heart College,70.8,y,y
+saint ignatius college,drysdale,no_match,,Saint Ignatius College Geelong,73.1,y
+salesian college,chadstone,no_match,,Marian College,73.3,Salesian College Chadstone
+seda college,camberwell,no_match,,Padua College,72.0,SEDA College (Victoria)
+seda college,hawthorn east,no_match,,Padua College,72.0,
+shepparton ace sec college,shepparton,no_match,,Shepparton ACE Secondary College,69.0,y
+siena college,camberwell,no_match,,Siena College Ltd,73.3,y
+sirius college - eastmeadows,broadmeadows,no_match,,Damascus College,59.1,Sirius College
+sirius college - ibrahim dellal,sunshine west,no_match,,Pyramid Hill College,54.9,
+sirius college - keysborough,keysborough,no_match,,Keysborough Secondary College,66.7,
+sirius college - meadow fair,broadmeadows,no_match,,Damascus College,59.1,
+south oakleigh sec college,oakleigh south,no_match,,South Oakleigh College,79.2,y
+springside west sec college,fraser rise,no_match,,Springside West Secondary College,76.7,y
+st john's greek orth college,preston,no_match,,St John's College Preston,64.2,y
+st mary of the angels school,nathalia,no_match,,St John the Evangelist School,70.2,St Mary of the Angels College
+st mary's coptic orth college,coolaroo,no_match,,St Mary's Coptic Orthodox College,77.4,y
+st monica's college,epping,no_match,,St Leonard's College,71.8,
+st paul's anglican grammar schl,warragul,no_match,,St Paul's Anglican Grammar School,81.2,y
+strathcona baptist girls gs,canterbury,no_match,,Strathcona Baptist Girls' Grammar,73.3,y
+sunbury downs sec college,sunbury,no_match,,Sunbury Downs Secondary College,75.0,y
+surf coast sec college,torquay,no_match,,Surf Coast Secondary College,72.0,y
+swinburne senior sec college,hawthorn,no_match,,Swinburne Senior Secondary College,77.4,y
+taylors lakes sec college,taylors lakes,no_match,,Taylors Lakes Secondary College,75.0,y
+terang college sec campus,terang,no_match,,Geelong Baptist College,62.5,Terang College
+the david scott school,frankston,no_match,,David Scott School,75.0,y
+the hamilton & alexandra coll,hamilton,no_match,,The Hamilton and Alexandra College,73.0,y
+trinity grammar school,kew,no_match,,Trinity Grammar School Kew,79.2,y
+victorian college of the arts,southbank,no_match,,Victorian College For The Deaf,67.8,Victorian College Of The Arts Secondary School
+warracknabeal sec college,warracknabeal,no_match,,Warracknabeal Secondary College,78.6,y
+werrimull p-12 college,werrimull,no_match,,Merrilands College,60.0,Werrimull P-12 School
+western heights sec college,hamlyn heights,no_match,,Western Heights Secondary College,76.7,y
+western port sec college,hastings,no_match,,Western Port Secondary College,74.1,y
+wheelers hill sec college,wheelers hill,no_match,,Wheelers Hill Secondary College,75.0,y
+william ruthven sec college,reservoir,no_match,,William Ruthven Secondary College,76.7,y
+wodonga senior sec college,wodonga,no_match,,Wodonga Senior Secondary College,75.9,y
+wyndham central sec coll,werribee,no_match,,Wyndham Central Secondary College,70.2,y
+wyndham comm & educ centre,werribee,no_match,,Wyndham Central Secondary College,54.2,
+yarra hills sec coll mooroolbark,mooroolbark,no_match,,Yarra Hills Secondary College,55.7,Yarra Hills Secondary College
+yarra hills sec coll mt evelyn,mount evelyn,no_match,,Yarra Hills Secondary College,61.0,
+yarra valley grammar school,ringwood,no_match,,Yarra Valley Grammar,72.3,y

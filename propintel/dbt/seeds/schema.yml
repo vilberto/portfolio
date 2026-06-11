@@ -18,6 +18,26 @@ seeds:
       - name: sal_name
         description: Exact ABS SAL_NAME21 string — mixed case, matches sal_lookup.sal_name precisely. Do not lowercase.
 
+  - name: school_name_crosswalk
+    description: >
+      Maps VCAA SSCAI (school, locality) pairs to canonical ACARA school names.
+      Only covers schools that don't exact-match ACARA after lower() — 1-to-1
+      exact matches join directly in the mart without a crosswalk entry.
+      See seeds/school_crosswalk_notes.md for full methodology and the
+      need_locality join pattern.
+    columns:
+      - name: vcaa_school
+        description: VCAA school name, lowercased and trimmed. Part of composite key.
+      - name: vcaa_locality
+        description: VCAA locality, lowercased and trimmed. Part of composite key — required because same school name appears across unrelated schools in different localities.
+      - name: acara_school_name
+        description: Exact ACARA School Name string — mixed case, matches school_profile."School Name" precisely. Do not lowercase.
+      - name: need_locality
+        description: >
+          Set to 'y' when ACARA has multiple entries with the same school name and no
+          name-level disambiguation. Mart join must add AND lower(acara.Suburb) = vcaa_locality
+          for these rows. See school_crosswalk_notes.md for the SQL pattern.
+
   - name: dffh_suburb_group_mapping
     description: >
       Maps DFFH suburb group strings to canonical ABS SAL_NAME21 strings.
