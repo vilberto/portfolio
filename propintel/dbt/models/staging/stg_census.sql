@@ -1,5 +1,5 @@
 select
-    g02.SAL_CODE_2021                   as sal_code,
+    regexp_replace(g02.SAL_CODE_2021, '^SAL', '') as sal_code,
     g02.Median_tot_hhd_inc_weekly       as median_hhd_inc_weekly,
     g37.O_OR_Total                      as owned_outright_total,
     g37.O_MTG_Total                     as owned_mortgage_total,

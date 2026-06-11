@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: suburb_metrics
+    description: >
+      One row per ABS Statistical Area Level 2 (SAL) suburb in Victoria.
+      Joins house price, unit price, SEIFA, rent, and census data to the suburb spine.
+      Metro-focused sources (price, rent) will be null for non-metro suburbs.
+    columns:
+      - name: sal_code
+        description: ABS SAL_CODE21 — primary key.
+        data_tests:
+          - not_null
+          - unique
+      - name: sal_name
+        description: Canonical ABS SAL_NAME21 with state-disambiguation suffixes stripped.
+        data_tests:
+          - not_null
+      - name: metro_house_median
+        description: Melbourne-wide median house price for the latest quarter — non-null for all rows (cross join).
+        data_tests:
+          - not_null
