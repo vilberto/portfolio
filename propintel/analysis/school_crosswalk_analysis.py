@@ -101,7 +101,8 @@ def main() -> None:
                     "fuzzy_candidate": "",
                     "fuzzy_score": "",
                     "acara_school_name": "",
-                    "need_locality": "",
+                    "need_acara_suburb": "",
+                    "exclude": "",
                 }
             )
         else:
@@ -118,7 +119,8 @@ def main() -> None:
                     "fuzzy_candidate": candidate,
                     "fuzzy_score": round(score, 1),
                     "acara_school_name": "",
-                    "need_locality": "",
+                    "need_acara_suburb": "",
+                    "exclude": "",
                 }
             )
 

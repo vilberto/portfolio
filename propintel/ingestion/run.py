@@ -21,6 +21,8 @@ Individual commands:
 Convert commands:
     convert-abs-boundary     ABS SAL boundary SHP → processed/abs/sal_boundary.parquet
     convert-sal-lookup       ABS SAL metadata XLSX → processed/abs/sal_lookup.parquet
+    convert-abs-mb-lga       ABS ASGS MB-LGA allocation XLSX → processed/abs/asgs/mb_lga.parquet
+    convert-abs-mb-sal       ABS ASGS MB-SAL allocation XLSX → processed/abs/asgs/mb_sal.parquet
     convert-house-price-quarterly  VicGov median house price XLS → processed/vic-property-sales/house_price_quarterly.parquet
     convert-house-price-series     VicGov house price annual series XLSX → processed/vic-property-sales/house_price_series.parquet
     convert-unit-price-quarterly            VicGov median unit price XLS → processed/vic-property-sales/unit_price_quarterly.parquet
@@ -80,6 +82,8 @@ _COMMANDS = {
     "auction-backfill": ("ingestion.auction", "fetch_auction_backfill"),
     "convert-abs-boundary": ("ingestion.convert", "convert_abs_boundary"),
     "convert-sal-lookup": ("ingestion.convert", "convert_sal_lookup"),
+    "convert-abs-mb-lga": ("ingestion.convert", "convert_abs_mb_lga"),
+    "convert-abs-mb-sal": ("ingestion.convert", "convert_abs_mb_sal"),
     "convert-house-price-quarterly": (
         "ingestion.convert",
         "convert_house_price_quarterly",

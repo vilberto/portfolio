@@ -103,3 +103,11 @@ sources:
       - name: auction_results_raw
         meta:
           external_location: "read_csv('../data/raw/auction/results_*.csv')"
+
+      - name: abs_mb_lga
+        meta:
+          external_location: "read_parquet('../data/processed/abs/asgs/mb_lga.parquet')"
+
+      - name: abs_mb_sal
+        meta:
+          external_location: "read_parquet('../data/processed/abs/asgs/mb_sal.parquet')"

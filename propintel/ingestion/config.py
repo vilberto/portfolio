@@ -7,6 +7,7 @@ RAW_DIR = DATA_DIR / "raw"
 PROCESSED_DIR = DATA_DIR / "processed"
 
 ABS_DIR = RAW_DIR / "abs"
+ABS_ASGS_DIR = ABS_DIR / "asgs"
 VIC_PROPERTY_SALES_DIR = RAW_DIR / "vic-property-sales"
 DFFH_RENT_DIR = RAW_DIR / "dffh-rent"
 ACARA_SCHOOL_DIR = RAW_DIR / "acara-school"

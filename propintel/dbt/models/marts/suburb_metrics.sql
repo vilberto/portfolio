@@ -138,8 +138,9 @@ select
     m.metro_unit_qoq_change,
     m.metro_unit_1y_change
 from {{ ref('stg_suburb_boundary') }} b
-left join price_resolved pr         on b.sal_code = pr.sal_code
-left join {{ ref('stg_seifa') }} se  on b.sal_code = se.sal_code
-left join rent r                    on b.sal_code = r.sal_code
-left join {{ ref('stg_census') }} c  on b.sal_code = c.sal_code
+inner join {{ ref('stg_metro_sal') }} ms on b.sal_code = ms.sal_code
+left join price_resolved pr              on b.sal_code = pr.sal_code
+left join {{ ref('stg_seifa') }} se      on b.sal_code = se.sal_code
+left join rent r                         on b.sal_code = r.sal_code
+left join {{ ref('stg_census') }} c      on b.sal_code = c.sal_code
 cross join metro_prices m

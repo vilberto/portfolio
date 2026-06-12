@@ -21,23 +21,36 @@ trimmed) and vice versa, the mart joins directly — no crosswalk entry needed.
 - Schools where no reliable ACARA match could be confirmed (left blank in
   analysis CSV, not carried forward)
 
-## need_locality flag
+## need_acara_suburb flag
 
-Five schools have `need_locality = y`: Marian College (×3) and Sacred Heart
+Five schools have `need_acara_suburb = y`: Marian College (×3) and Sacred Heart
 College (×2). ACARA has multiple entries with the exact same school name and no
-location disambiguation in the name itself. The mart join for these rows must
-include the ACARA suburb column:
+location disambiguation in the name itself. These are distinct ACARA schools that
+share an identical name — the flag signals that the mart join must add an ACARA
+suburb condition to resolve to the correct ACARA SML ID:
 
 ```sql
-left join stg_acara_school_profile a
-  on lower(trim(a."School Name")) = xwalk.acara_school_name
- and (xwalk.need_locality is null
-      or lower(trim(a."Suburb")) = xwalk.vcaa_locality)
+left join acara_with_sal a
+  on lower(a.school_name) = lower(vr.acara_name_target)
+ and (vr.need_acara_suburb is null
+      or lower(a.suburb) = vr.xw_locality)
 ```
 
-When `need_locality` is null the suburb condition short-circuits to true,
-making it a name-only join. When `need_locality = y` both conditions apply,
-picking the correct campus.
+When `need_acara_suburb` is null the suburb condition short-circuits to true,
+making it a name-only join. When `need_acara_suburb = y` both conditions apply,
+picking the correct ACARA record by suburb.
+
+## exclude flag
+
+Twenty sub-campus entries have `exclude = y`. These are VCAA rows where the school
+appears under a second locality (e.g. Ivanhoe Grammar at Mernda in addition to
+Ivanhoe). Without an explicit crosswalk entry the left join falls through to
+`coalesce(acara_school_name, vcaa_school)`, producing the same `acara_name_target`
+as the main campus row and causing a fan-out duplicate in the mart.
+
+Adding these rows with `exclude = y` (and no `acara_school_name`) lets the crosswalk
+join match them, after which `WHERE xw.exclude IS NULL` drops them before they reach
+the final join.
 
 ## Key (vcaa_school, vcaa_locality)
 

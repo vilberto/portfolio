@@ -20,6 +20,7 @@ import pandas as pd
 
 from ingestion.config import (
     ACARA_SCHOOL_DIR,
+    ABS_ASGS_DIR,
     ABS_DIR,
     DFFH_RENT_DIR,
     PROCESSED_ACARA_DIR,
@@ -226,6 +227,30 @@ def convert_sal_lookup() -> Path:
     out.parent.mkdir(parents=True, exist_ok=True)
     df.to_parquet(out, compression="snappy")
     return out
+
+
+def _convert_abs_asgs_allocation(entity: str) -> Path:
+    src = ABS_ASGS_DIR / f"{entity}_2021_AUST.xlsx"
+    if not src.exists():
+        raise FileNotFoundError(f"ABS MB-{entity} file not found: {src}")
+
+    df = pd.read_excel(src, dtype=str)
+    df = df[df["STATE_CODE_2021"] == "2"][
+        ["MB_CODE_2021", f"{entity}_CODE_2021", f"{entity}_NAME_2021"]
+    ].reset_index(drop=True)
+
+    out = PROCESSED_ABS_DIR / "asgs" / f"mb_{entity.lower()}.parquet"
+    out.parent.mkdir(parents=True, exist_ok=True)
+    df.to_parquet(out, compression="snappy", index=False)
+    return out
+
+
+def convert_abs_mb_lga() -> Path:
+    return _convert_abs_asgs_allocation("LGA")
+
+
+def convert_abs_mb_sal() -> Path:
+    return _convert_abs_asgs_allocation("SAL")
 
 
 def _quarterly_sort_key(p: Path) -> tuple[int, int]:

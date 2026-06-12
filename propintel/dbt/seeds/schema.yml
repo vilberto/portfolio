@@ -24,7 +24,7 @@ seeds:
       Only covers schools that don't exact-match ACARA after lower() — 1-to-1
       exact matches join directly in the mart without a crosswalk entry.
       See seeds/school_crosswalk_notes.md for full methodology and the
-      need_locality join pattern.
+      need_acara_suburb join pattern.
     columns:
       - name: vcaa_school
         description: VCAA school name, lowercased and trimmed. Part of composite key.
@@ -32,11 +32,18 @@ seeds:
         description: VCAA locality, lowercased and trimmed. Part of composite key — required because same school name appears across unrelated schools in different localities.
       - name: acara_school_name
         description: Exact ACARA School Name string — mixed case, matches school_profile."School Name" precisely. Do not lowercase.
-      - name: need_locality
+      - name: need_acara_suburb
         description: >
-          Set to 'y' when ACARA has multiple entries with the same school name and no
-          name-level disambiguation. Mart join must add AND lower(acara.Suburb) = vcaa_locality
-          for these rows. See school_crosswalk_notes.md for the SQL pattern.
+          Set to 'y' when ACARA has multiple records with the exact same school name
+          (e.g. Marian College ×3, Sacred Heart College ×2). The mart join must add
+          AND lower(acara.suburb) = vcaa_locality to resolve to the correct ACARA SML ID.
+          See school_crosswalk_notes.md for the SQL pattern.
+      - name: exclude
+        description: >
+          Set to 'y' for known sub-campus VCAA entries that must be suppressed before
+          joining to ACARA. These rows have no acara_school_name. Their presence in the
+          crosswalk prevents the fallback coalesce(acara_school_name, vcaa_school) from
+          matching the same ACARA record as the main campus row.
 
   - name: dffh_suburb_group_mapping
     description: >

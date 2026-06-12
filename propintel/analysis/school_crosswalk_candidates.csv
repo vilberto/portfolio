@@ -1,52 +1,52 @@
-vcaa_school,vcaa_locality,case_type,exact_acara_name,fuzzy_candidate,fuzzy_score,acara_school_name,need_locality
-adass israel school,east st kilda,duplicate,Adass Israel School,,,
+vcaa_school,vcaa_locality,case_type,exact_acara_name,fuzzy_candidate,fuzzy_score,acara_school_name,need_acara_suburb,exclude
+adass israel school,east st kilda,duplicate,Adass Israel School,,,,,y
 adass israel school,elsternwick,duplicate,Adass Israel School,,,y
-bacchus marsh grammar,aintree,duplicate,Bacchus Marsh Grammar,,,
+bacchus marsh grammar,aintree,duplicate,Bacchus Marsh Grammar,,,,,y
 bacchus marsh grammar,bacchus marsh,duplicate,Bacchus Marsh Grammar,,,y
-beaconhills college,berwick,duplicate,Beaconhills College,,,
+beaconhills college,berwick,duplicate,Beaconhills College,,,,,y
 beaconhills college,pakenham,duplicate,Beaconhills College,,,y
 caulfield grammar school,st kilda east,duplicate,Caulfield Grammar School,,,y
-caulfield grammar school,wheelers hill,duplicate,Caulfield Grammar School,,,
+caulfield grammar school,wheelers hill,duplicate,Caulfield Grammar School,,,,,y
 chairo christian school,drouin,duplicate,Chairo Christian School,,,y
-chairo christian school,leongatha,duplicate,Chairo Christian School,,,
-chairo christian school,nar nar goon,duplicate,Chairo Christian School,,,
+chairo christian school,leongatha,duplicate,Chairo Christian School,,,,,y
+chairo christian school,nar nar goon,duplicate,Chairo Christian School,,,,,y
 charles la trobe p-12 college,macleod west,duplicate,Charles La Trobe P-12 College,,,y
-charles la trobe p-12 college,preston,duplicate,Charles La Trobe P-12 College,,,
+charles la trobe p-12 college,preston,duplicate,Charles La Trobe P-12 College,,,,,y
 cire community school,lilydale,duplicate,Cire Community School,,,y
-cire community school,yarra junction,duplicate,Cire Community School,,,
+cire community school,yarra junction,duplicate,Cire Community School,,,,,y
 collingwood college,collingwood,duplicate,Collingwood College,,,y
-collingwood college,fitzroy north,duplicate,Collingwood College,,,
+collingwood college,fitzroy north,duplicate,Collingwood College,,,,,y
 emmanuel college,altona north,duplicate,Emmanuel College,,,Emmanuel College
 emmanuel college,warrnambool,duplicate,Emmanuel College,,,Emmanuel College Warrnambool
-gilson college,mernda,duplicate,Gilson College,,,
+gilson college,mernda,duplicate,Gilson College,,,,,y
 gilson college,taylors hill,duplicate,Gilson College,,,y
-heathdale christian college,melton,duplicate,Heathdale Christian College,,,
+heathdale christian college,melton,duplicate,Heathdale Christian College,,,,,y
 heathdale christian college,werribee,duplicate,Heathdale Christian College,,,y
 heritage college,ferntree gully,duplicate,Heritage College,,,Heritage College Knox
 heritage college,officer,duplicate,Heritage College,,,Heritage College
 hester hornbrook academy,melbourne,duplicate,Hester Hornbrook Academy,,,y
-hester hornbrook academy,south melbourne,duplicate,Hester Hornbrook Academy,,,
+hester hornbrook academy,south melbourne,duplicate,Hester Hornbrook Academy,,,,,y
 ilim college,broadmeadows,duplicate,Ilim College,,,y
-ilim college,doveton,duplicate,Ilim College,,,
+ilim college,doveton,duplicate,Ilim College,,,,,y
 ivanhoe grammar school,ivanhoe,duplicate,Ivanhoe Grammar School,,,y
-ivanhoe grammar school,mernda,duplicate,Ivanhoe Grammar School,,,
+ivanhoe grammar school,mernda,duplicate,Ivanhoe Grammar School,,,,,y
 lighthouse christian college,cranbourne,duplicate,Lighthouse Christian College,,,Lighthouse Christian College Cranbourne
 lighthouse christian college,keysborough,duplicate,Lighthouse Christian College,,,Lighthouse Christian College
-minaret college,officer,duplicate,Minaret College,,,
+minaret college,officer,duplicate,Minaret College,,,,,y
 minaret college,springvale,duplicate,Minaret College,,,y
-plenty river college,greensborough,duplicate,Plenty River College,,,
+plenty river college,greensborough,duplicate,Plenty River College,,,,,y
 plenty river college,south morang,duplicate,Plenty River College,,,y
-simonds catholic college,fitzroy north,duplicate,Simonds Catholic College,,,
+simonds catholic college,fitzroy north,duplicate,Simonds Catholic College,,,,,y
 simonds catholic college,west melbourne,duplicate,Simonds Catholic College,,,y
 st joseph's college,echuca,duplicate,St Joseph's College,,,St Joseph's College - Brigidine Campus
 st joseph's college,ferntree gully,duplicate,St Joseph's College,,,St Joseph's College
 st joseph's college,mildura,duplicate,St Joseph's College,,,St Joseph's College Mildura
 st joseph's college,newtown,duplicate,St Joseph's College,,,St Joseph's College Geelong
 village high school,ryanston,duplicate,Village High School,,,y
-village high school,wonthaggi,duplicate,Village High School,,,
-waverley christian college,narre warren south,duplicate,Waverley Christian College,,,
+village high school,wonthaggi,duplicate,Village High School,,,,,y
+waverley christian college,narre warren south,duplicate,Waverley Christian College,,,,,y
 waverley christian college,wantirna south,duplicate,Waverley Christian College,,,y
-wesley college,glen waverley,duplicate,Wesley College,,,
+wesley college,glen waverley,duplicate,Wesley College,,,,,y
 wesley college,melbourne,duplicate,Wesley College,,,y
 advance college of education,rosebud west,no_match,,Advance College of Education Incorporated,72.5,y
 australian internatl academy,caroline springs,no_match,,Australian International Academy of Education,71.2,

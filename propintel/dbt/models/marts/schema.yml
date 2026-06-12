@@ -3,9 +3,12 @@ version: 2
 models:
   - name: suburb_metrics
     description: >
-      One row per ABS Statistical Area Level 2 (SAL) suburb in Victoria.
-      Joins house price, unit price, SEIFA, rent, and census data to the suburb spine.
-      Metro-focused sources (price, rent) will be null for non-metro suburbs.
+      One row per Greater Melbourne metro suburb (ABS SAL), filtered to the 31 metro LGAs
+      via the ABS ASGS MB-LGA concordance. Joins house price, unit price, SEIFA, rent, and
+      census data onto the suburb boundary spine. Price and rent columns are null for suburbs
+      not covered by VicGov/DFFH data. Metro price benchmarks are sourced directly from the
+      VicGov Melbourne metropolitan area quarterly file — they are metro by source, not derived
+      from the suburb rows.
     columns:
       - name: sal_code
         description: ABS SAL_CODE21 — primary key.
@@ -20,3 +23,59 @@ models:
         description: Melbourne-wide median house price for the latest quarter — non-null for all rows (cross join).
         data_tests:
           - not_null
+
+  - name: school_profiles
+    description: >
+      One row per school in Greater Melbourne metro (filtered to the 31 metro LGAs via
+      ABS ASGS concordance). Joins ACARA profile + location (most recent year) with VCAA
+      senior secondary results (most recent year) via a school name crosswalk.
+
+      sal_code is assigned by spatial containment (ST_Contains) of each school's lat/lon
+      within the ABS suburb boundary polygons — no address lookup required.
+
+      VCE benchmarks (avg_vce_median_study_score, avg_pct_study_score_40_plus) are computed
+      from metro schools only — schools whose sal_code falls within a metro LGA. This means
+      they reflect Melbourne metro performance, not statewide.
+
+      Student-teacher ratio benchmark (sector_avg_student_teacher_ratio) is averaged by
+      school_sector (Government / Catholic / Independent) across metro schools.
+    columns:
+      - name: acara_sml_id
+        description: ACARA School My School ID — primary key.
+        data_tests:
+          - not_null
+          - unique
+      - name: sal_code
+        description: >
+          ABS SAL_CODE21 of the suburb containing this school, derived via spatial join.
+          Null if the school's coordinates fall outside all suburb polygons (should not occur
+          for valid VIC coordinates).
+      - name: school_sector
+        description: "Government, Catholic, or Independent."
+      - name: school_type
+        description: "Primary, Secondary, or Combined."
+      - name: year_range
+        description: "Year levels offered, e.g. 'Prep–6', '7–12', 'Prep–12'."
+      - name: icsea_percentile_state
+        description: >
+          ICSEA percentile rank within Victoria, as published by ACARA. Higher values
+          indicate higher socio-educational advantage relative to other VIC schools.
+      - name: student_teacher_ratio
+        description: FTE enrolments divided by FTE teaching staff. Computed from ACARA data.
+      - name: vcaa_year
+        description: >
+          Year of the VCAA result joined to this school. Null for schools with no VCE
+          cohort (primary schools, or schools too small to report).
+      - name: avg_vce_median_study_score
+        description: >
+          Mean of school-level VCE median study scores across metro schools with a
+          reportable cohort. Benchmark is metro-only, not statewide.
+      - name: avg_pct_study_score_40_plus
+        description: >
+          Mean of school-level pct_study_score_40_plus across metro schools with a
+          reportable cohort. Benchmark is metro-only, not statewide.
+      - name: sector_avg_student_teacher_ratio
+        description: >
+          Average student-teacher ratio for schools in the same sector (Government /
+          Catholic / Independent) across metro schools. Partitioned by sector because
+          staffing norms differ significantly across sectors.
