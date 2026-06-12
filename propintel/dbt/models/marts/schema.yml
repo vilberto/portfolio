@@ -19,10 +19,74 @@ models:
         description: Canonical ABS SAL_NAME21 with state-disambiguation suffixes stripped.
         data_tests:
           - not_null
+      - name: geometry
+        description: Suburb boundary polygon in WGS84 (EPSG:4326), sourced from ABS ASGS.
+      - name: house_price_quarter
+        description: Quarter label for the latest median house price (e.g. 'Sep-2025'). Null if no VicGov data for this suburb.
+      - name: latest_median_house_price
+        description: Median house sale price for the latest available quarter. Null if no VicGov data.
+      - name: house_price_qoq_change
+        description: Quarter-on-quarter change in median house price (%). Null if prior quarter unavailable.
+      - name: house_price_1y_change
+        description: Same-quarter year-on-year change in median house price (%). Null if year-ago quarter unavailable.
+      - name: unit_price_quarter
+        description: Quarter label for the latest median unit price. Null if no VicGov data for this suburb.
+      - name: latest_median_unit_price
+        description: Median unit sale price for the latest available quarter. Null if no VicGov data.
+      - name: unit_price_qoq_change
+        description: Quarter-on-quarter change in median unit price (%). Null if prior quarter unavailable.
+      - name: unit_price_1y_change
+        description: Same-quarter year-on-year change in median unit price (%). Null if year-ago quarter unavailable.
+      - name: irsd_state_pct
+        description: SEIFA Index of Relative Socio-economic Disadvantage — state percentile (1–100, higher = less disadvantaged). ABS 2021.
+      - name: irsad_state_pct
+        description: SEIFA Index of Relative Socio-economic Advantage and Disadvantage — state percentile (1–100). ABS 2021.
+      - name: ier_state_pct
+        description: SEIFA Index of Economic Resources — state percentile (1–100). ABS 2021.
+      - name: ieo_state_pct
+        description: SEIFA Index of Education and Occupation — state percentile (1–100). ABS 2021.
+      - name: latest_median_rent
+        description: Moving annual median rent across all property types (DFFH). Null if no DFFH mapping for this suburb.
+      - name: rent_qoq_change
+        description: Quarter-on-quarter change in median rent (%). Null if prior quarter unavailable.
+      - name: rent_1y_change
+        description: Year-on-year change in median rent (%). Null if year-ago quarter unavailable.
+      - name: rent_region
+        description: DFFH suburb group name this suburb belongs to — used to join region benchmark rent.
+      - name: region_median_rent
+        description: Moving annual median rent for the DFFH region Group Total (all property types). Benchmark for rent_region.
+      - name: region_rent_qoq_change
+        description: QoQ change in region median rent (%).
+      - name: region_rent_1y_change
+        description: YoY change in region median rent (%).
+      - name: median_hhd_inc_weekly
+        description: Median total household income per week. ABS Census 2021 (G02), SA2-to-SAL approximation.
+      - name: pct_owned
+        description: Percentage of dwellings owned outright or with a mortgage. ABS Census 2021 (G37).
+      - name: pct_rented
+        description: Percentage of dwellings rented. ABS Census 2021 (G37).
+      - name: affordability_ratio
+        description: >
+          Median house price divided by annualised median household income
+          (median_hhd_inc_weekly × 52). Higher = less affordable. Null if either input is null.
+      - name: metro_price_quarter
+        description: Quarter label for the Melbourne-wide benchmark prices — non-null for all rows (cross join).
+        data_tests:
+          - not_null
       - name: metro_house_median
         description: Melbourne-wide median house price for the latest quarter — non-null for all rows (cross join).
         data_tests:
           - not_null
+      - name: metro_house_qoq_change
+        description: QoQ change in Melbourne-wide median house price (%).
+      - name: metro_house_1y_change
+        description: YoY change in Melbourne-wide median house price (%).
+      - name: metro_unit_median
+        description: Melbourne-wide median unit price for the latest quarter.
+      - name: metro_unit_qoq_change
+        description: QoQ change in Melbourne-wide median unit price (%).
+      - name: metro_unit_1y_change
+        description: YoY change in Melbourne-wide median unit price (%).
 
   - name: school_profiles
     description: >
@@ -31,51 +95,67 @@ models:
       senior secondary results (most recent year) via a school name crosswalk.
 
       sal_code is assigned by spatial containment (ST_Contains) of each school's lat/lon
-      within the ABS suburb boundary polygons — no address lookup required.
+      within the ABS suburb boundary polygons — no address lookup required. Non-metro
+      schools are excluded by the inner join to stg_metro_sal, not by geography checks.
 
       VCE benchmarks (avg_vce_median_study_score, avg_pct_study_score_40_plus) are computed
-      from metro schools only — schools whose sal_code falls within a metro LGA. This means
-      they reflect Melbourne metro performance, not statewide.
-
-      Student-teacher ratio benchmark (sector_avg_student_teacher_ratio) is averaged by
-      school_sector (Government / Catholic / Independent) across metro schools.
+      from metro schools only. Student-teacher ratio benchmark is by sector across metro schools.
     columns:
       - name: acara_sml_id
         description: ACARA School My School ID — primary key.
         data_tests:
           - not_null
           - unique
-      - name: sal_code
-        description: >
-          ABS SAL_CODE21 of the suburb containing this school, derived via spatial join.
-          Null if the school's coordinates fall outside all suburb polygons (should not occur
-          for valid VIC coordinates).
+      - name: calendar_year
+        description: ACARA reporting year for profile and enrolment data.
+      - name: school_name
+        description: Canonical ACARA school name.
+      - name: suburb
+        description: Suburb as recorded in ACARA data.
       - name: school_sector
         description: "Government, Catholic, or Independent."
       - name: school_type
         description: "Primary, Secondary, or Combined."
       - name: year_range
         description: "Year levels offered, e.g. 'Prep–6', '7–12', 'Prep–12'."
-      - name: icsea_percentile_state
+      - name: school_url
+        description: My School URL for this school.
+      - name: icsea
+        description: Index of Community Socio-Educational Advantage score. National mean is 1000.
+      - name: icsea_percentile_metro
         description: >
-          ICSEA percentile rank within Victoria, as published by ACARA. Higher values
-          indicate higher socio-educational advantage relative to other VIC schools.
+          ICSEA percentile rank within the Melbourne metro school cohort, computed via
+          percent_rank() over metro schools. Replaces the ACARA-published national percentile,
+          which is less meaningful for a Melbourne-only product.
+      - name: fte_teaching_staff
+        description: Full-time equivalent teaching staff count (ACARA).
+      - name: fte_enrolments
+        description: Full-time equivalent enrolment count (ACARA).
       - name: student_teacher_ratio
-        description: FTE enrolments divided by FTE teaching staff. Computed from ACARA data.
+        description: FTE enrolments divided by FTE teaching staff, rounded to 1 dp. Null if fte_teaching_staff is zero.
+      - name: lbote_yes_pct
+        description: Percentage of students with a language background other than English (ACARA).
+      - name: latitude
+        description: School latitude in WGS84 (ACARA school location file).
+      - name: longitude
+        description: School longitude in WGS84 (ACARA school location file).
+      - name: sal_code
+        description: ABS SAL_CODE21 of the suburb containing this school, assigned by spatial containment join.
       - name: vcaa_year
-        description: >
-          Year of the VCAA result joined to this school. Null for schools with no VCE
-          cohort (primary schools, or schools too small to report).
+        description: Year of the VCAA result joined to this school. Null for primary schools or schools with no reportable VCE cohort.
+      - name: ib_available
+        description: Whether the International Baccalaureate is offered (VCAA). Null for non-VCE schools.
+      - name: vce_study_count
+        description: Number of distinct VCE study enrolments (VCAA). Null for non-VCE schools.
+      - name: vce_enrolments
+        description: Number of VCE enrolments (VCAA). Null for non-VCE schools.
+      - name: vce_median_study_score
+        description: Median VCE study score for this school (VCAA). Null if cohort too small to report or non-VCE school.
+      - name: pct_study_score_40_plus
+        description: Percentage of study scores ≥ 40 (VCAA). Null if cohort too small to report or non-VCE school.
       - name: avg_vce_median_study_score
-        description: >
-          Mean of school-level VCE median study scores across metro schools with a
-          reportable cohort. Benchmark is metro-only, not statewide.
+        description: Metro-wide mean of school-level VCE median study scores. Non-null for all rows (cross join). Benchmark for vce_median_study_score.
       - name: avg_pct_study_score_40_plus
-        description: >
-          Mean of school-level pct_study_score_40_plus across metro schools with a
-          reportable cohort. Benchmark is metro-only, not statewide.
+        description: Metro-wide mean of school-level pct_study_score_40_plus. Non-null for all rows (cross join).
       - name: sector_avg_student_teacher_ratio
-        description: >
-          Average student-teacher ratio for schools in the same sector (Government /
-          Catholic / Independent) across metro schools. Partitioned by sector because
-          staffing norms differ significantly across sectors.
+        description: Average student-teacher ratio for schools in the same sector (Government / Catholic / Independent) across metro schools.

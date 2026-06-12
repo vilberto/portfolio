@@ -343,6 +343,13 @@ Cost: ~$1.50 across ~550 Melbourne suburbs. Generate once, serve statically.
 - `planning_summary` — deferred; address-level server-side identify is the right pattern
 - Further census columns in suburb_metrics — TBC after data inspection
 
+## Tech debt
+
+- **Staging schema.yml coverage** — most staging models have no schema.yml entry or incomplete
+  column documentation. Best practice is to document every column in every model (source name
+  if renamed, transformation, nullability). Tackle as a standalone pass before or during
+  Session 9 mart/API work, when staging models are otherwise being touched.
+
 ## Key files to read at session start
 
 - propintel/CLAUDE.md

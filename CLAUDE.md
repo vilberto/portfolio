@@ -224,6 +224,12 @@ Place files in `data/raw/vicmap-planning/` (zones ~130MB, overlays ~650MB)
 - Do not run generated shell commands or SQL without reading them first
 - Do not accept a fix for an error without reading and understanding the error yourself first
 
+**dbt schema.yml**
+- Update schema.yml in the same commit as the model it describes — never as a separate cleanup step
+- Document every column in every model (mart, staging, seed) — undocumented columns show up as blanks in dbt docs
+- For staging: describe the source column name if renamed, any transformation applied, and nullability — one line is fine, but don't skip
+- `not_null` + `unique` data tests on every mart PK at minimum
+
 **Git hygiene**
 - Commits are atomic and describe the *why*, not the *what*
 - No generated files, build artefacts, or local config committed
