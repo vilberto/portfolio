@@ -103,17 +103,32 @@ Files: `ai/comparables.py`, `tests/ai/test_comparables.py`
 - Pure function — no side effects, no LLM. Unit-testable in isolation.
 - Unit test: verify output shape, self-exclusion, null suburb handling.
 
-## Step 6 — `ai/validators.py`
+## Step 6 — `ai/schemas.py` + `ai/validators.py`
 
-Files: `ai/validators.py`, `tests/ai/test_validators.py`
+Files: `ai/schemas.py`, `ai/validators.py`, `tests/ai/test_validators.py`
 
-Deterministic checks; returns `list[str]` of error strings (empty = pass):
+**First define the contract.** `ai/schemas.py` holds `GenerationOutput` — the
+structured object the generate node emits: `{summary, fields_used, schools_mentioned}`.
+This is the validators' input type and the generate node's output type, so it lives in
+a neutral module both can import downward. It does **not** belong in `validators.py`
+(the validator consumes it, doesn't own it) nor in `summary_graph.py` (which imports
+`validators`, so the producer can't own a type the consumer needs — that's a cycle).
+`SuburbRecord`/`SchoolRecord` stay in `record_builder.py`: a type lives with its
+producer unless that creates a cycle, in which case it goes neutral.
+
+`ai/validators.py` — deterministic checks over a `GenerationOutput` + `SuburbRecord`;
+returns `list[str]` of error strings (empty = pass):
 - **grounding**: each value in `fields_used` matches the source record.
 - **no invented schools**: each `schools_mentioned` entry is in the record's school list.
 - **light prose scan**: no number or school name in the summary absent from the source
   record or declared metadata.
 - **length budget**: 3–4 sentences.
-- Unit test: cover each check with a pass and fail case.
+- Unit test: cover each check with a pass and fail case (mock `GenerationOutput` +
+  `SuburbRecord`; no DuckDB, no LLM).
+
+The validators are the executable spec for "valid output"; Step 7's prompt rules are
+the mirror image of these checks. Expect to touch both together — if a validator
+checks something the model can't reliably emit, the prompt and the check move as a pair.
 
 ## Step 7 — `ai/prompts.py`
 
