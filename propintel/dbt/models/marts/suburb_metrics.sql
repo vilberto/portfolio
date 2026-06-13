@@ -120,10 +120,21 @@ select
     se.irsd_score,
     se.ier_score,
     se.ieo_score,
-    round(percent_rank() over (order by se.irsad_score) * 100, 1) as irsad_metro_pctl,
-    round(percent_rank() over (order by se.irsd_score)  * 100, 1) as irsd_metro_pctl,
-    round(percent_rank() over (order by se.ier_score)   * 100, 1) as ier_metro_pctl,
-    round(percent_rank() over (order by se.ieo_score)   * 100, 1) as ieo_metro_pctl,
+    -- Rank only over suburbs with a non-null score: partition by the nullness flag so
+    -- quality-flagged (null) rows form their own partition and neither receive a
+    -- percentile nor inflate the denominator. The case discards the null partition.
+    case when se.irsad_score is not null then
+        round(percent_rank() over (partition by (se.irsad_score is null) order by se.irsad_score) * 100, 1)
+    end as irsad_metro_pctl,
+    case when se.irsd_score is not null then
+        round(percent_rank() over (partition by (se.irsd_score is null) order by se.irsd_score) * 100, 1)
+    end as irsd_metro_pctl,
+    case when se.ier_score is not null then
+        round(percent_rank() over (partition by (se.ier_score is null) order by se.ier_score) * 100, 1)
+    end as ier_metro_pctl,
+    case when se.ieo_score is not null then
+        round(percent_rank() over (partition by (se.ieo_score is null) order by se.ieo_score) * 100, 1)
+    end as ieo_metro_pctl,
     -- rent
     r.latest_median_rent,
     r.rent_qoq_change,
@@ -135,7 +146,14 @@ select
     r.region_rent_1y_change,
     -- census
     c.median_hhd_inc_weekly,
-    round(percent_rank() over (order by c.median_hhd_inc_weekly) * 100, 1) as median_hhd_inc_metro_pctl,
+    -- Zero income is a no-data sentinel, not a real value — exclude it from the ranking
+    -- (else the zeros pile up as "most disadvantaged") and emit null.
+    case when c.median_hhd_inc_weekly > 0 then
+        round(percent_rank() over (
+            partition by (c.median_hhd_inc_weekly = 0)
+            order by c.median_hhd_inc_weekly
+        ) * 100, 1)
+    end as median_hhd_inc_metro_pctl,
     c.pct_owned,
     c.pct_rented,
     round(avg(c.pct_owned)  over (), 1) as avg_pct_owned_metro,

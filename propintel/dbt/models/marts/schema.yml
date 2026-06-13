@@ -51,13 +51,13 @@ models:
       - name: ieo_score
         description: SEIFA IEO raw index score — Index of Education and Occupation. ABS 2021. Null if quality-flagged.
       - name: irsad_metro_pctl
-        description: IRSAD percentile rank within the Melbourne metro suburb cohort (0–100, higher = more advantaged). Computed via percent_rank() over metro suburbs.
+        description: IRSAD percentile rank within the Melbourne metro suburb cohort (0–100, higher = more advantaged), computed via percent_rank() over suburbs with a non-null score. Null if the IRSAD score is unavailable (quality-flagged); such suburbs are excluded from the ranking.
       - name: irsd_metro_pctl
-        description: IRSD percentile rank within the Melbourne metro suburb cohort (0–100, higher = less disadvantaged).
+        description: IRSD percentile rank within the Melbourne metro suburb cohort (0–100, higher = less disadvantaged). Null if the IRSD score is unavailable (quality-flagged); such suburbs are excluded from the ranking.
       - name: ier_metro_pctl
-        description: IER percentile rank within the Melbourne metro suburb cohort (0–100).
+        description: IER percentile rank within the Melbourne metro suburb cohort (0–100). Null if the IER score is unavailable (quality-flagged); such suburbs are excluded from the ranking.
       - name: ieo_metro_pctl
-        description: IEO percentile rank within the Melbourne metro suburb cohort (0–100).
+        description: IEO percentile rank within the Melbourne metro suburb cohort (0–100). Null if the IEO score is unavailable (quality-flagged); such suburbs are excluded from the ranking.
       - name: latest_median_rent
         description: Moving annual median rent across all property types (DFFH). Null if no DFFH mapping for this suburb.
       - name: rent_qoq_change
@@ -75,7 +75,7 @@ models:
       - name: median_hhd_inc_weekly
         description: Median total household income per week. ABS Census 2021 (G02), SA2-to-SAL approximation.
       - name: median_hhd_inc_metro_pctl
-        description: Median household income percentile rank within the Melbourne metro cohort (0–100).
+        description: Median household income percentile rank within the Melbourne metro cohort (0–100). Null if income is zero (a no-data sentinel); such suburbs are excluded from the ranking.
       - name: pct_owned
         description: Percentage of dwellings owned outright or with a mortgage. ABS Census 2021 (G37).
       - name: pct_rented
