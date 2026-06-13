@@ -63,25 +63,33 @@ acara_with_sal as (
     inner join {{ ref('stg_metro_sal') }} ms on b.sal_code = ms.sal_code
 ),
 
--- VCE benchmarks from metro schools (sal_code already resolved in acara_with_sal)
-vce_benchmarks as (
+-- VCE percentiles computed over VCE schools only (non-null vce_enrolments).
+-- Keeping this in a CTE avoids null-denominator distortion from primary schools
+-- inflating the total row count in a flat window function.
+vce_pctls as (
     select
-        round(avg(vr.vce_median_study_score),  1) as avg_vce_median_study_score,
-        round(avg(vr.pct_study_score_40_plus), 1) as avg_pct_study_score_40_plus
+        a.acara_sml_id,
+        case when vr.vce_median_study_score is not null
+            then round(percent_rank() over (order by vr.vce_median_study_score nulls last) * 100, 1)
+        end as vce_median_study_score_metro_pctl,
+        case when vr.vce_median_study_score is not null
+            then round(percent_rank() over (partition by a.school_sector order by vr.vce_median_study_score nulls last) * 100, 1)
+        end as vce_median_study_score_sector_pctl,
+        case when vr.pct_study_score_40_plus is not null
+            then round(percent_rank() over (order by vr.pct_study_score_40_plus nulls last) * 100, 1)
+        end as pct_study_score_40_plus_metro_pctl,
+        case when vr.pct_study_score_40_plus is not null
+            then round(percent_rank() over (partition by a.school_sector order by vr.pct_study_score_40_plus nulls last) * 100, 1)
+        end as pct_study_score_40_plus_sector_pctl,
+        round(percent_rank() over (order by vr.vce_study_count nulls last)                             * 100, 1) as vce_study_count_metro_pctl,
+        round(percent_rank() over (partition by a.school_sector order by vr.vce_study_count nulls last) * 100, 1) as vce_study_count_sector_pctl,
+        round(percent_rank() over (order by vr.vce_enrolments nulls last)                              * 100, 1) as vce_enrolments_metro_pctl,
+        round(percent_rank() over (partition by a.school_sector order by vr.vce_enrolments nulls last)  * 100, 1) as vce_enrolments_sector_pctl
     from acara_with_sal a
-    left join vcaa_resolved vr
+    inner join vcaa_resolved vr
         on lower(a.school_name) = lower(vr.acara_name_target)
        and (vr.need_acara_suburb is null or lower(a.suburb) = vr.xw_locality)
-    where vr.vce_median_study_score is not null
-),
-
--- Average student-teacher ratio by sector — metro via acara_with_sal
-str_benchmark as (
-    select
-        school_sector,
-        round(avg(student_teacher_ratio), 1) as avg_student_teacher_ratio
-    from acara_with_sal
-    group by school_sector
+    where vr.vce_enrolments is not null
 )
 
 select
@@ -95,11 +103,15 @@ select
     a.year_range,
     a.school_url,
     a.icsea,
-    round(percent_rank() over (order by a.icsea) * 100, 1) as icsea_percentile_metro,
+    round(percent_rank() over (order by a.icsea)                              * 100, 1) as icsea_metro_pctl,
+    round(percent_rank() over (partition by a.school_sector order by a.icsea) * 100, 1) as icsea_sector_pctl,
     a.fte_teaching_staff,
     a.fte_enrolments,
     a.student_teacher_ratio,
+    round(percent_rank() over (order by a.student_teacher_ratio)                              * 100, 1) as str_metro_pctl,
+    round(percent_rank() over (partition by a.school_sector order by a.student_teacher_ratio) * 100, 1) as str_sector_pctl,
     a.lbote_yes_pct,
+    round(percent_rank() over (order by a.lbote_yes_pct) * 100, 1) as lbote_yes_metro_pctl,
     -- location + geography
     a.latitude,
     a.longitude,
@@ -108,16 +120,19 @@ select
     vr.vcaa_year,
     vr.ib_available,
     vr.vce_study_count,
+    vp.vce_study_count_metro_pctl,
+    vp.vce_study_count_sector_pctl,
     vr.vce_enrolments,
+    vp.vce_enrolments_metro_pctl,
+    vp.vce_enrolments_sector_pctl,
     vr.vce_median_study_score,
+    vp.vce_median_study_score_metro_pctl,
+    vp.vce_median_study_score_sector_pctl,
     vr.pct_study_score_40_plus,
-    -- benchmarks
-    bv.avg_vce_median_study_score,
-    bv.avg_pct_study_score_40_plus,
-    bs.avg_student_teacher_ratio       as sector_avg_student_teacher_ratio
+    vp.pct_study_score_40_plus_metro_pctl,
+    vp.pct_study_score_40_plus_sector_pctl
 from acara_with_sal a
 left join vcaa_resolved vr
     on lower(a.school_name) = lower(vr.acara_name_target)
    and (vr.need_acara_suburb is null or lower(a.suburb) = vr.xw_locality)
-cross join vce_benchmarks bv
-left join str_benchmark bs on a.school_sector = bs.school_sector
+left join vce_pctls vp on a.acara_sml_id = vp.acara_sml_id

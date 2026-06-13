@@ -81,6 +81,23 @@ metro_prices as (
         round((unit_median  - unit_1y_ago)  / nullif(unit_1y_ago,  0) * 100, 1) as metro_unit_1y_change
     from metro_prices_raw
     qualify row_number() over (order by price_quarter desc) = 1
+),
+
+census as (
+    select
+        sal_code,
+        median_hhd_inc_weekly,
+        round(
+            (owned_outright_total + owned_mortgage_total)::double
+            / nullif(owned_outright_total + owned_mortgage_total + rented_total, 0)
+            * 100,
+        1) as pct_owned,
+        round(
+            rented_total::double
+            / nullif(owned_outright_total + owned_mortgage_total + rented_total, 0)
+            * 100,
+        1) as pct_rented
+    from {{ ref('stg_census') }}
 )
 
 select
@@ -98,11 +115,15 @@ select
     pr.latest_median_unit_price,
     pr.unit_price_qoq_change,
     pr.unit_price_1y_change,
-    -- SEIFA
-    se.irsd_state_pct,
-    se.irsad_state_pct,
-    se.ier_state_pct,
-    se.ieo_state_pct,
+    -- SEIFA raw scores + metro percentiles
+    se.irsad_score,
+    se.irsd_score,
+    se.ier_score,
+    se.ieo_score,
+    round(percent_rank() over (order by se.irsad_score) * 100, 1) as irsad_metro_pctl,
+    round(percent_rank() over (order by se.irsd_score)  * 100, 1) as irsd_metro_pctl,
+    round(percent_rank() over (order by se.ier_score)   * 100, 1) as ier_metro_pctl,
+    round(percent_rank() over (order by se.ieo_score)   * 100, 1) as ieo_metro_pctl,
     -- rent
     r.latest_median_rent,
     r.rent_qoq_change,
@@ -114,16 +135,11 @@ select
     r.region_rent_1y_change,
     -- census
     c.median_hhd_inc_weekly,
-    round(
-        (c.owned_outright_total + c.owned_mortgage_total)::double
-        / nullif(c.owned_outright_total + c.owned_mortgage_total + c.rented_total, 0)
-        * 100,
-    1) as pct_owned,
-    round(
-        c.rented_total::double
-        / nullif(c.owned_outright_total + c.owned_mortgage_total + c.rented_total, 0)
-        * 100,
-    1) as pct_rented,
+    round(percent_rank() over (order by c.median_hhd_inc_weekly) * 100, 1) as median_hhd_inc_metro_pctl,
+    c.pct_owned,
+    c.pct_rented,
+    round(avg(c.pct_owned)  over (), 1) as avg_pct_owned_metro,
+    round(avg(c.pct_rented) over (), 1) as avg_pct_rented_metro,
     -- affordability ratio: house price / annual household income
     case
         when c.median_hhd_inc_weekly > 0
@@ -143,5 +159,5 @@ inner join {{ ref('stg_metro_sal') }} ms on b.sal_code = ms.sal_code
 left join price_resolved pr              on b.sal_code = pr.sal_code
 left join {{ ref('stg_seifa') }} se      on b.sal_code = se.sal_code
 left join rent r                         on b.sal_code = r.sal_code
-left join {{ ref('stg_census') }} c      on b.sal_code = c.sal_code
+left join census c                       on b.sal_code = c.sal_code
 cross join metro_prices m

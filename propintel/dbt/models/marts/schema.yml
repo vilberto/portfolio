@@ -8,7 +8,7 @@ models:
       census data onto the suburb boundary spine. Price and rent columns are null for suburbs
       not covered by VicGov/DFFH data. Metro price benchmarks are sourced directly from the
       VicGov Melbourne metropolitan area quarterly file — they are metro by source, not derived
-      from the suburb rows.
+      from the suburb rows. SEIFA and census percentiles are computed over the metro cohort only.
     columns:
       - name: sal_code
         description: ABS SAL_CODE21 — primary key.
@@ -42,14 +42,22 @@ models:
         description: Quarter-on-quarter change in median unit price (%). Null if prior quarter unavailable.
       - name: unit_price_1y_change
         description: Same-quarter year-on-year change in median unit price (%). Null if year-ago quarter unavailable.
-      - name: irsd_state_pct
-        description: SEIFA Index of Relative Socio-economic Disadvantage — state percentile (1–100, higher = less disadvantaged). ABS 2021.
-      - name: irsad_state_pct
-        description: SEIFA Index of Relative Socio-economic Advantage and Disadvantage — state percentile (1–100). ABS 2021.
-      - name: ier_state_pct
-        description: SEIFA Index of Economic Resources — state percentile (1–100). ABS 2021.
-      - name: ieo_state_pct
-        description: SEIFA Index of Education and Occupation — state percentile (1–100). ABS 2021.
+      - name: irsad_score
+        description: SEIFA IRSAD raw index score — Index of Relative Socio-economic Advantage and Disadvantage. ABS 2021. Null if quality-flagged.
+      - name: irsd_score
+        description: SEIFA IRSD raw index score — Index of Relative Socio-economic Disadvantage (higher = less disadvantaged). ABS 2021. Null if quality-flagged.
+      - name: ier_score
+        description: SEIFA IER raw index score — Index of Economic Resources. ABS 2021. Null if quality-flagged.
+      - name: ieo_score
+        description: SEIFA IEO raw index score — Index of Education and Occupation. ABS 2021. Null if quality-flagged.
+      - name: irsad_metro_pctl
+        description: IRSAD percentile rank within the Melbourne metro suburb cohort (0–100, higher = more advantaged). Computed via percent_rank() over metro suburbs.
+      - name: irsd_metro_pctl
+        description: IRSD percentile rank within the Melbourne metro suburb cohort (0–100, higher = less disadvantaged).
+      - name: ier_metro_pctl
+        description: IER percentile rank within the Melbourne metro suburb cohort (0–100).
+      - name: ieo_metro_pctl
+        description: IEO percentile rank within the Melbourne metro suburb cohort (0–100).
       - name: latest_median_rent
         description: Moving annual median rent across all property types (DFFH). Null if no DFFH mapping for this suburb.
       - name: rent_qoq_change
@@ -66,10 +74,16 @@ models:
         description: YoY change in region median rent (%).
       - name: median_hhd_inc_weekly
         description: Median total household income per week. ABS Census 2021 (G02), SA2-to-SAL approximation.
+      - name: median_hhd_inc_metro_pctl
+        description: Median household income percentile rank within the Melbourne metro cohort (0–100).
       - name: pct_owned
         description: Percentage of dwellings owned outright or with a mortgage. ABS Census 2021 (G37).
       - name: pct_rented
         description: Percentage of dwellings rented. ABS Census 2021 (G37).
+      - name: avg_pct_owned_metro
+        description: Metro-wide average of pct_owned. Non-null for all rows (window avg). Benchmark for pct_owned.
+      - name: avg_pct_rented_metro
+        description: Metro-wide average of pct_rented. Non-null for all rows (window avg). Benchmark for pct_rented.
       - name: affordability_ratio
         description: >
           Median house price divided by annualised median household income
@@ -103,8 +117,10 @@ models:
       within the ABS suburb boundary polygons — no address lookup required. Non-metro
       schools are excluded by the inner join to stg_metro_sal, not by geography checks.
 
-      VCE benchmarks (avg_vce_median_study_score, avg_pct_study_score_40_plus) are computed
-      from metro schools only. Student-teacher ratio benchmark is by sector across metro schools.
+      Percentile benchmarks are provided at two scopes: metro (all metro schools) and
+      sector (within Government / Catholic / Independent). VCE percentiles are computed
+      over VCE schools only (non-null vce_enrolments) to avoid null-denominator distortion
+      from primary schools.
     columns:
       - name: acara_sml_id
         description: ACARA School My School ID — primary key.
@@ -127,19 +143,24 @@ models:
         description: My School URL for this school.
       - name: icsea
         description: Index of Community Socio-Educational Advantage score. National mean is 1000.
-      - name: icsea_percentile_metro
-        description: >
-          ICSEA percentile rank within the Melbourne metro school cohort, computed via
-          percent_rank() over metro schools. Replaces the ACARA-published national percentile,
-          which is less meaningful for a Melbourne-only product.
+      - name: icsea_metro_pctl
+        description: ICSEA percentile rank within the Melbourne metro school cohort (0–100).
+      - name: icsea_sector_pctl
+        description: ICSEA percentile rank within the school's sector (Government / Catholic / Independent) across metro schools (0–100).
       - name: fte_teaching_staff
         description: Full-time equivalent teaching staff count (ACARA).
       - name: fte_enrolments
         description: Full-time equivalent enrolment count (ACARA).
       - name: student_teacher_ratio
         description: FTE enrolments divided by FTE teaching staff, rounded to 1 dp. Null if fte_teaching_staff is zero.
+      - name: str_metro_pctl
+        description: Student-teacher ratio percentile rank within all metro schools (0–100, higher = larger class size).
+      - name: str_sector_pctl
+        description: Student-teacher ratio percentile rank within the school's sector across metro schools (0–100).
       - name: lbote_yes_pct
         description: Percentage of students with a language background other than English (ACARA).
+      - name: lbote_yes_metro_pctl
+        description: LBOTE percentage percentile rank within all metro schools (0–100).
       - name: latitude
         description: School latitude in WGS84 (ACARA school location file).
       - name: longitude
@@ -151,16 +172,26 @@ models:
       - name: ib_available
         description: Whether the International Baccalaureate is offered (VCAA). Null for non-VCE schools.
       - name: vce_study_count
-        description: Number of distinct VCE study enrolments (VCAA). Null for non-VCE schools.
+        description: Number of distinct VCE study enrolments — breadth of curriculum offering (VCAA). Null for non-VCE schools.
+      - name: vce_study_count_metro_pctl
+        description: vce_study_count percentile rank within VCE schools in metro (0–100). Null for non-VCE schools.
+      - name: vce_study_count_sector_pctl
+        description: vce_study_count percentile rank within the school's sector among VCE metro schools (0–100). Null for non-VCE schools.
       - name: vce_enrolments
         description: Number of VCE enrolments (VCAA). Null for non-VCE schools.
+      - name: vce_enrolments_metro_pctl
+        description: vce_enrolments percentile rank within VCE schools in metro (0–100). Null for non-VCE schools.
+      - name: vce_enrolments_sector_pctl
+        description: vce_enrolments percentile rank within the school's sector among VCE metro schools (0–100). Null for non-VCE schools.
       - name: vce_median_study_score
         description: Median VCE study score for this school (VCAA). Null if cohort too small to report or non-VCE school.
+      - name: vce_median_study_score_metro_pctl
+        description: vce_median_study_score percentile rank within VCE metro schools with a reportable score (0–100). Null if score is null.
+      - name: vce_median_study_score_sector_pctl
+        description: vce_median_study_score percentile rank within the school's sector among VCE metro schools with a reportable score (0–100). Null if score is null.
       - name: pct_study_score_40_plus
         description: Percentage of study scores ≥ 40 (VCAA). Null if cohort too small to report or non-VCE school.
-      - name: avg_vce_median_study_score
-        description: Metro-wide mean of school-level VCE median study scores. Non-null for all rows (cross join). Benchmark for vce_median_study_score.
-      - name: avg_pct_study_score_40_plus
-        description: Metro-wide mean of school-level pct_study_score_40_plus. Non-null for all rows (cross join).
-      - name: sector_avg_student_teacher_ratio
-        description: Average student-teacher ratio for schools in the same sector (Government / Catholic / Independent) across metro schools.
+      - name: pct_study_score_40_plus_metro_pctl
+        description: pct_study_score_40_plus percentile rank within VCE metro schools with a reportable score (0–100). Null if score is null.
+      - name: pct_study_score_40_plus_sector_pctl
+        description: pct_study_score_40_plus percentile rank within the school's sector among VCE metro schools with a reportable score (0–100). Null if score is null.

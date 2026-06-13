@@ -68,12 +68,14 @@ def convert_seifa() -> Path:
 
     frames = []
     for sheet, prefix in _SEIFA_SHEETS:
-        df = pd.read_excel(src, sheet_name=sheet, header=5, usecols=[0, 1, 9, 12, 16])
+        # usecols order in file: 0=sal_code, 1=sal_name, 3=raw_score, 9=state, 16=quality_flag
+        # pandas returns cols in ascending index order regardless of usecols list order
+        df = pd.read_excel(src, sheet_name=sheet, header=5, usecols=[0, 1, 3, 9, 16])
         df.columns = [
             "sal_code",
             "sal_name",
+            f"{prefix}_score",
             "state",
-            f"{prefix}_state_pct",
             f"{prefix}_quality_flag",
         ]
         # Drop non-data rows (empty cells, copyright footer) — artifact removal, not business logic
@@ -88,17 +90,15 @@ def convert_seifa() -> Path:
             "sal_code",
             "sal_name",
             "state",
-            f"{spine_prefix}_state_pct",
+            f"{spine_prefix}_score",
             f"{spine_prefix}_quality_flag",
         ]
     ]
     for df in frames[1:]:
-        pct_cols = [
-            c
-            for c in df.columns
-            if c.endswith("_state_pct") or c.endswith("_quality_flag")
+        score_cols = [
+            c for c in df.columns if c.endswith("_score") or c.endswith("_quality_flag")
         ]
-        result = result.merge(df[["sal_code"] + pct_cols], on="sal_code", how="left")
+        result = result.merge(df[["sal_code"] + score_cols], on="sal_code", how="left")
 
     out = PROCESSED_ABS_DIR / "seifa.parquet"
     out.parent.mkdir(parents=True, exist_ok=True)
