@@ -53,11 +53,28 @@ def test_grounding_fail_value_mismatch():
     assert any("does not match record value" in e for e in errors)
 
 
+def test_grounding_pass_value_rounded_to_claimed_precision():
+    # The model is shown rounded values; a claim of 68 must match a record value of 67.7.
+    record = make_record(pct_owned=67.7)
+    output = GenerationOutput(summary="A. B. C.", fields_used={"pct_owned": 68})
+    assert validate(output, record) == []
+
+
 def test_grounding_fail_unknown_field():
     record = make_record()
     output = GenerationOutput(summary="A. B. C.", fields_used={"not_a_field": 5})
     errors = validate(output, record)
     assert any("unknown field" in e for e in errors)
+
+
+def test_grounding_skips_school_field_in_fields_used():
+    # A school field name in fields_used is not a hallucinated field — it's grounded by
+    # the prose scan + schools_mentioned, so grounding skips it rather than erroring.
+    record = make_record()
+    output = GenerationOutput(
+        summary="A. B. C.", fields_used={"vce_median_study_score": 36}
+    )
+    assert validate(output, record) == []
 
 
 def test_grounding_fail_field_is_null():
@@ -109,6 +126,15 @@ def test_prose_numbers_pass_percentile():
     output = GenerationOutput(
         summary="It sits in the 87th percentile for advantage. B. C.",
         fields_used={"irsad_metro_pctl": 87.3},
+    )
+    assert validate(output, record) == []
+
+
+def test_prose_numbers_pass_negative_change_as_magnitude():
+    # A negative change stated as a positive magnitude ("fell 16.5%") must reconcile.
+    record = make_record(house_price_1y_change=-16.5)
+    output = GenerationOutput(
+        summary="House prices fell 16.5% over the year. B. C.",
     )
     assert validate(output, record) == []
 

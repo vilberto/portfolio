@@ -23,12 +23,16 @@ for this light scan — the prompt carries the "only name provided schools" rule
 
 import re
 
-from ai.record_builder import SuburbRecord
+from ai.record_builder import SchoolRecord, SuburbRecord
 from ai.schemas import GenerationOutput
 
-# Prose numbers may be rounded versions of record values; declared fields should not.
+# Prose numbers may be rounded versions of record values (tolerated within 5%).
 _PROSE_REL_TOL = 0.05
-_GROUNDING_REL_TOL = 1e-4
+
+# School stats belong to schools_mentioned + the prose scan, not fields_used. The model
+# occasionally lists one anyway; a school field name is not a hallucinated field, so skip
+# it here rather than flag it (the prose scan still grounds any school number it states).
+_SCHOOL_FIELD_NAMES = set(SchoolRecord.model_fields)
 
 # $1.2M / 1,250,000 / 87.3% / 620k — leading digit required; suffix word-bounded so it
 # does not eat letters from a following word ("5 metres" must not parse as 5 million).
@@ -56,6 +60,8 @@ def _check_grounding(output: GenerationOutput, record: SuburbRecord) -> list[str
     errors: list[str] = []
     record_values = record.model_dump()
     for field, claimed in output.fields_used.items():
+        if field in _SCHOOL_FIELD_NAMES:
+            continue
         if field not in record_values:
             errors.append(f"fields_used references unknown field {field!r}")
             continue
@@ -82,6 +88,9 @@ def _check_schools(output: GenerationOutput, record: SuburbRecord) -> list[str]:
 
 def _check_prose_numbers(output: GenerationOutput, record: SuburbRecord) -> list[str]:
     candidates = _record_numbers(record) | _declared_numbers(output)
+    # A negative change is often stated in prose as a positive magnitude ("down 16.5%"),
+    # so reconcile against absolute values too.
+    candidates |= {abs(c) for c in candidates}
     errors: list[str] = []
     for token, value in _extract_numbers(output.summary):
         if not any(_reconciles(value, c, _PROSE_REL_TOL) for c in candidates):
@@ -102,11 +111,27 @@ def _check_length(output: GenerationOutput) -> list[str]:
 
 
 def _values_match(claimed: object, actual: object) -> bool:
-    """Near-exact match for declared metadata; numeric where both coerce to numbers."""
+    """Grounding match for a declared figure.
+
+    The model is shown rounded values and echoes them, so a claim is correct when the
+    record value, rounded to the *same precision the model stated*, equals the claim:
+    a claim of 68 matches a record value of 67.7 (68 at 0 dp), 14.7 matches 14.7, but
+    70 still fails against 67.7. Non-numeric values fall back to string equality.
+    """
     cf, af = _as_float(claimed), _as_float(actual)
     if cf is not None and af is not None:
-        return _reconciles(cf, af, _GROUNDING_REL_TOL)
+        decimals = _claimed_decimals(claimed)
+        return round(af, decimals) == round(cf, decimals)
     return str(claimed).strip().lower() == str(actual).strip().lower()
+
+
+def _claimed_decimals(claimed: object) -> int:
+    """Decimal places in the model's stated figure — the precision to round to."""
+    if isinstance(claimed, bool) or isinstance(claimed, int):
+        return 0
+    text = repr(claimed) if isinstance(claimed, float) else str(claimed).strip()
+    text = text.lstrip("$").rstrip("%").replace(",", "")
+    return len(text.split(".")[1]) if "." in text else 0
 
 
 def _reconciles(value: float, candidate: float, rel_tol: float) -> bool:

@@ -29,8 +29,9 @@ A structured object with three fields:
 numbers. Lead with what defines the place — its character and price position — then weave \
 in one or two supporting details (affordability, growth, schools, tenure mix). Cite figures \
 sparingly and only where they carry insight.
-- `fields_used`: every figure you state, as a map from the exact field key to the value you \
-used. If you mention it in the prose, it must appear here with the value from the data.
+- `fields_used`: every **suburb-level** figure you state, as a map from the exact field key \
+to the value as given in the data. Do not put school statistics here — naming the school in \
+`schools_mentioned` is enough.
 - `schools_mentioned`: the exact names of any schools you name in the prose.
 
 ## Grounding rules (non-negotiable)
@@ -40,8 +41,9 @@ used. If you mention it in the prose, it must appear here with the value from th
 2. State only comparisons that are already given (e.g. the suburb's price against the \
    Melbourne median, both of which are provided). Never compute a new comparison.
 3. Name only schools that appear in the provided school list. Never invent a school name.
-4. Record every figure you cite in `fields_used` (exact key, exact value) and every school \
-   you name in `schools_mentioned`.
+4. Record every suburb-level figure you cite in `fields_used` (exact key, value as given) \
+   and every school you name in `schools_mentioned`. School statistics do not go in \
+   `fields_used`.
 5. Write 3-4 sentences. No more, no fewer.
 6. Never mention, apologise for, or allude to data that is absent — simply leave it out. \
    Most suburbs are missing some fields; that is normal and never worth remarking on.
@@ -124,8 +126,8 @@ Schools (each school in the list):
 - `vce_median_study_score_metro_pctl`: that score's percentile across Melbourne VCE schools.
 - `pct_study_score_40_plus`: % of this school's VCE study scores at 40 or above.
 
-When you cite a school figure in `fields_used`, key it by the school field name (e.g. \
-`vce_median_study_score`); name the school itself in `schools_mentioned`."""
+School figures do NOT go in `fields_used` — naming the school in `schools_mentioned` is \
+enough, and you may still cite its statistics in the prose."""
 
 
 # --- per-suburb user message ------------------------------------------------
