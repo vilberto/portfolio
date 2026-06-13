@@ -168,6 +168,16 @@ Files: `ai/generate_summaries.py`
 - At this step: iterate prompts in `ai/prompts.py` until output quality is
   satisfactory on the 10-suburb sample.
 
+**Prompt iteration backlog (from the Step 7 smoke test — prose was already good):**
+1. **Conciseness.** Summaries read slightly long. Tighten toward shorter prose that keeps
+   every insight but drops filler — the reader digests faster and it sits better in the
+   sidebar. Don't sacrifice an insight for length; cut words, not facts.
+2. **Adjective range.** The conservative vocabulary is starting to feel narrow (repeated
+   "well-established", "tightly held", "owner-occupier-heavy"). Expand the palette carefully
+   — more variety without becoming aggressive or overconfident. Each new adjective still
+   needs a defensible data trigger (see the rubric in `prompts.py`); widen the wording, not
+   the confidence.
+
 ## Step 10 — FastAPI `GET /suburbs/{slug}/summary`
 
 Files: `api/main.py`
