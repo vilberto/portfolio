@@ -3,6 +3,21 @@
 Read SESSION_8_ADDENDUM.md (Part C section) as the scope spec first.
 This file is the executable build sequence.
 
+## Progress — resume here
+
+Steps 0–7 complete and committed: dbt slug + SEIFA/income percentile fixes, the
+affordability benchmark, and the `ai/` package (`db`, `record_builder`, `comparables`,
+`schemas`, `validators`, `prompts`) with unit tests. **Resume at Step 8**
+(`ai/summary_graph.py`).
+
+The Step 7 smoke script — `scratch/smoke_summaries.py` (gitignored, on disk) — already
+implements and proves the Step 8 `generate` node: it calls the anthropic SDK with
+`system_blocks()` + `build_user_message(record)`, forces structured output via a tool
+derived from `GenerationOutput`, parses it, and runs the validators. Lift that call into
+the graph's `generate` node. Run it with `PYTHONPATH=. python scratch/smoke_summaries.py`
+(`ANTHROPIC_API_KEY` is set in `.env`). Smoke result: 6/7 validated, prose quality good;
+prompt-iteration notes are logged under Step 9.
+
 ## Confirmed decisions
 
 1. **AI output table** — separate `ai/`-owned DuckDB table `suburb_summary` keyed by
