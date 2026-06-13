@@ -98,6 +98,16 @@ census as (
             * 100,
         1) as pct_rented
     from {{ ref('stg_census') }}
+),
+
+affordability as (
+    select
+        pr.sal_code,
+        round(pr.latest_median_house_price / (c.median_hhd_inc_weekly * 52.0), 1) as affordability_ratio
+    from price_resolved pr
+    join census c on pr.sal_code = c.sal_code
+    where c.median_hhd_inc_weekly > 0
+      and pr.latest_median_house_price is not null
 )
 
 select
@@ -158,12 +168,11 @@ select
     c.pct_rented,
     round(avg(c.pct_owned)  over (), 1) as avg_pct_owned_metro,
     round(avg(c.pct_rented) over (), 1) as avg_pct_rented_metro,
-    -- affordability ratio: house price / annual household income
-    case
-        when c.median_hhd_inc_weekly > 0
-             and pr.latest_median_house_price is not null
-        then round(pr.latest_median_house_price / (c.median_hhd_inc_weekly * 52.0), 1)
-    end as affordability_ratio,
+    -- affordability: suburb price-to-income, with the metro median as benchmark.
+    -- Median, not mean: the ratio has a long right tail, so the median is the honest
+    -- "typical". The summary states the suburb's ratio against it, never computes it.
+    a.affordability_ratio,
+    round(median(a.affordability_ratio) over (), 1) as metro_affordability_ratio_median,
     -- metro price benchmarks (latest quarter)
     m.metro_price_quarter,
     m.metro_house_median,
@@ -178,4 +187,5 @@ left join price_resolved pr              on b.sal_code = pr.sal_code
 left join {{ ref('stg_seifa') }} se      on b.sal_code = se.sal_code
 left join rent r                         on b.sal_code = r.sal_code
 left join census c                       on b.sal_code = c.sal_code
+left join affordability a                on b.sal_code = a.sal_code
 cross join metro_prices m

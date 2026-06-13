@@ -88,6 +88,11 @@ models:
         description: >
           Median house price divided by annualised median household income
           (median_hhd_inc_weekly × 52). Higher = less affordable. Null if either input is null.
+      - name: metro_affordability_ratio_median
+        description: >
+          Metro-wide median of affordability_ratio across suburbs with data — the typical
+          Melbourne suburb's price-to-income multiple. Median (not mean) because the ratio
+          is right-skewed. Non-null for all rows (window median); benchmark for affordability_ratio.
       - name: metro_price_quarter
         description: Quarter label for the Melbourne-wide benchmark prices — non-null for all rows (cross join).
         data_tests:

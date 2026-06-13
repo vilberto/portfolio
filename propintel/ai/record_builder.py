@@ -81,6 +81,7 @@ class SuburbRecord(BaseModel):
     avg_pct_rented_metro: float | None
     # affordability
     affordability_ratio: float | None
+    metro_affordability_ratio_median: float | None
     # schools in this suburb (may be empty)
     schools: list[SchoolRecord] = []
 
@@ -98,7 +99,7 @@ SELECT
     latest_median_rent, rent_1y_change, rent_region, region_median_rent, region_rent_1y_change,
     median_hhd_inc_weekly, median_hhd_inc_metro_pctl,
     pct_owned, pct_rented, avg_pct_owned_metro, avg_pct_rented_metro,
-    affordability_ratio
+    affordability_ratio, metro_affordability_ratio_median
 FROM suburb_metrics
 WHERE sal_slug = ?
 """
