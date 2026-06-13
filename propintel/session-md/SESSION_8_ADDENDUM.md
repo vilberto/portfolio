@@ -7,15 +7,18 @@ Read both before starting.
 
 Two decisions were made in planning after SESSION_8.md was written:
 
-**1. Session 8 now includes a RAG layer (Part C)**
+**1. Session 8 now includes an AI layer (Part C)**
 
-After completing the mart build, immediately build a RAG pipeline and suburb
-highlight feature. 
+After completing the mart build, build suburb highlight summaries and a
+semantic search feature.
 
-Feature: pre-generated suburb highlight summaries powered by ChromaDB +
-Ollama embeddings + Claude API. Summaries generated once at pipeline time,
-stored in DuckDB, served statically from FastAPI. New endpoint:
-GET /suburbs/{slug}/summary. New Streamlit sidebar panel on suburb click.
+Feature: pre-generated suburb summaries powered by Claude API (Sonnet) +
+LangGraph evaluator-optimiser loop, stored in DuckDB, served statically
+from FastAPI. Comparable suburbs found via structured kNN (not embeddings —
+numeric signal). Generated summaries embedded via Ollama nomic-embed-text
+into ChromaDB to power semantic suburb search. New endpoints:
+GET /suburbs/{slug}/summary and GET /suburbs/search?q=.
+New Streamlit sidebar panel on suburb click.
 
 **2. Frontend will be rebuilt in React + Vite + MapLibre + deck.gl**
 
@@ -296,24 +299,75 @@ when address-level work starts.
 
 Run `dbt build && dbt test` after each mart. Do not batch.
 
-### Part C — RAG layer + suburb summaries
+### Part C — AI layer: suburb summaries + semantic search
 
-Begins only after `suburb_metrics` has SEIFA + rent + affordability, and
-`school_profiles` mart passes `dbt test`.
+> Executable build sequence: see **SESSION_8_PART_C.md** in this directory.
+> This section is the scope spec; that file is the step-by-step plan.
 
-1. Verify `ollama pull nomic-embed-text`
-2. Add `ANTHROPIC_API_KEY` to `.env` + `.env.example`
-3. `rag/document_builder.py` — query suburb_metrics + school_profiles,
-   construct one rich text document per suburb
-4. `rag/embedder.py` — embed via nomic-embed-text, persist to ChromaDB
-5. `rag/retriever.py` — suburb lookup + nearest-neighbour comparables (no LLM)
-6. `rag/generate_summaries.py` — retrieve doc + top 3 comparable slugs →
-   Claude API (Sonnet) → store as `ai_summary` in suburb_metrics.
-   Re-run quarterly on data refresh.
-7. FastAPI `GET /suburbs/{slug}/summary` — serve ai_summary + comparable slugs
-8. Streamlit sidebar panel — on suburb click, show summary + comparable links
+Package: `ai/` (not `rag/` — most of this is not RAG; the name would mislead).
+Begins only after `suburb_metrics` and `school_profiles` passes `dbt test`.
 
-Cost: ~$1.50 across ~550 Melbourne suburbs. Generate once, serve statically.
+Phase 1 — must complete (LangGraph orchestration + evaluation + grounded generation).
+No Ollama/ChromaDB dependency, so a local-inference snag cannot block it.
+
+1. ai/record_builder.py — query suburb_metrics, join school_profiles on sal_code,
+   return one STRUCTURED record per suburb (not a prose doc). Pass pre-computed
+   comparisons (e.g. 1y changes, metro benchmark deltas) so the model never does
+   arithmetic. Handle nulls explicitly.
+2. ai/comparables.py — structured kNN over normalised mart features
+   (e.g. median house price, an SEIFA percentile, affordability_ratio, rent, income).
+   Returns top-3 comparable slugs per suburb. Pure, unit-testable. NOT an LLM
+   concern; candidate to move to analytics/ or dbt later.
+3. ai/validators.py — deterministic checks driven by the generate node's
+   returned metadata, since a highlight is selective and varies per suburb:
+   - grounding: each value in fields_used matches the source record
+   - no invented schools: each schools_mentioned entry is in the record's
+     school list
+   - light prose scan: no number or school name in the summary that isn't in
+     the source record or declared metadata (tractable because output is short)
+   - length budget (3-4 sentences)
+4. ai/summary_graph.py — LangGraph evaluator-optimiser:
+   generate node returns STRUCTURED output {summary, fields_used,
+   schools_mentioned}; state carries the parsed object. retrieve (record +
+   comparables) -> generate -> validate -> conditional retry: errors empty OR 
+   attempts >= 3 -> store; else -> generate with validation_errors injected as 
+   feedback (attempts += 1).
+5. ai/generate_summaries.py — batch runner. Build graph once, invoke per suburb,
+   write ai_summary + ai_summary_validated to suburb_metrics. Store last attempt
+   with ai_summary_validated = false on retry exhaustion; log those slugs.
+   DEV TACTIC: run against ~10 suburbs while building; full ~550 run (~$1.50)
+   only once the loop is proven.
+6. FastAPI GET /suburbs/{slug}/summary — serve ai_summary + comparable slugs.
+7. Streamlit sidebar panel — summary + comparable links. Minimal; UI is being
+   rebuilt in React.
+
+Prompt design :
+- System prompt holds a constant data dictionary + rules; mark cache-eligible
+  (prompt caching). Per-suburb message carries values only.
+- Model uses ONLY provided figures; states pre-computed comparisons, never
+  computes them.
+- The prompts will be built and iterated later when we get to that point.
+
+Phase 2 
+
+8. ai/embedder.py — embed generated summaries (prose) via nomic-embed-text,
+   persist to ChromaDB. Embed summaries, NOT raw records (numeric text embeds
+   poorly).
+9. ai/search.py + FastAPI GET /suburbs/search?q= — embed query, vector search,
+   return ranked slugs + summaries.
+10. Streamlit search box.
+
+Decisions captured:
+- Comparables use structured kNN, not embedding-NN: the signal is numeric, and
+  embedding numeric-heavy text gives unreliable neighbours. Two retrieval methods
+  in this feature, each matched to the data type (structured for comparables,
+  semantic for free-text search).
+- document_builder dropped: nothing now consumes a prose doc. record_builder
+  returns structured data instead.
+
+Scope discipline (do not expand this session):
+- validators deterministic only; LLM-as-judge faithfulness is a later addition.
+- no human-in-the-loop node for now; ai_summary_validated flag + log is the stand-in.
 
 ## Additional engineering notes
 

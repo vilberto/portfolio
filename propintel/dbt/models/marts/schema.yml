@@ -19,6 +19,11 @@ models:
         description: Canonical ABS SAL_NAME21 with state-disambiguation suffixes stripped.
         data_tests:
           - not_null
+      - name: sal_slug
+        description: URL-safe slug derived from sal_name — lowercase, non-alphanumeric runs replaced with hyphens. Disambiguators preserved (e.g. 'Bellfield (Banyule)' → 'bellfield-banyule'). Used as the API route key.
+        data_tests:
+          - not_null
+          - unique
       - name: geometry
         description: Suburb boundary polygon in WGS84 (EPSG:4326), sourced from ABS ASGS.
       - name: house_price_quarter

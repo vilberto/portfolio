@@ -86,6 +86,7 @@ metro_prices as (
 select
     b.sal_code,
     b.sal_name,
+    b.sal_slug,
     b.geometry,
     -- house price
     pr.house_price_quarter,
