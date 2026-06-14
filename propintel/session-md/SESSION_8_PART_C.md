@@ -5,18 +5,17 @@ This file is the executable build sequence.
 
 ## Progress — resume here
 
-Steps 0–7 complete and committed: dbt slug + SEIFA/income percentile fixes, the
-affordability benchmark, and the `ai/` package (`db`, `record_builder`, `comparables`,
-`schemas`, `validators`, `prompts`) with unit tests. **Resume at Step 8**
-(`ai/summary_graph.py`).
+Steps 0–8 complete and committed. **Resume at Step 9** (`ai/generate_summaries.py`).
 
-The Step 7 smoke script — `scratch/smoke_summaries.py` (gitignored, on disk) — already
-implements and proves the Step 8 `generate` node: it calls the anthropic SDK with
-`system_blocks()` + `build_user_message(record)`, forces structured output via a tool
-derived from `GenerationOutput`, parses it, and runs the validators. Lift that call into
-the graph's `generate` node. Run it with `PYTHONPATH=. python scratch/smoke_summaries.py`
-(`ANTHROPIC_API_KEY` is set in `.env`). Smoke result: 6/7 validated, prose quality good;
-prompt-iteration notes are logged under Step 9.
+Graph invocation contract the runner must honour: open ONE read-write connection via
+`ai.db.summary_connection()` and pass it to `build_graph(con, client, model)` — the graph
+reads and writes through that single caller-owned handle (DuckDB is single-writer; do not
+open per-suburb or use the read-only `mart_connection`). Create `client` with
+`anthropic.Anthropic()` after loading `.env` (`ANTHROPIC_API_KEY`; `.env`-loading pattern in
+`scratch/smoke_summaries.py`). Invoke per suburb via `graph.invoke(initial_state(slug))`; a
+result is unvalidated when the final state's `validation_errors` is non-empty (also persisted
+as `ai_summary_validated`). The runner hits the live API and writes the real DB — default to
+`--limit`, confirm before the full ~550 run (~$1.50).
 
 ## Confirmed decisions
 
@@ -171,6 +170,23 @@ Flow: `retrieve` → `generate` → `validate` → conditional edge:
 `retrieve` node: call `record_builder` + `comparables`.
 
 `store` node: write to `suburb_summary` via `ai/db.py`.
+
+**Done (as built):**
+- `build_graph(con, client, model=MODEL)` factory; dependency-bound nodes (`retrieve`,
+  `generate`, `validate`, `store`) are closures over the injected `con`/`client`/`model`.
+  Pure helpers — `_route`, `_correction_block`, `_parse_tool_use` — are module-level
+  (underscore-private; the rule is *closure only what needs a dependency*). `MAX_ATTEMPTS = 3`.
+- Single caller-owned read-write connection for both reads and writes (DuckDB single-writer).
+  `ai/db.py` gained `upsert_summary` (JSON-serialises `comparable_slugs`, ON CONFLICT on
+  `sal_slug`, DB-set `generated_at`); `summary_connection()` now `LOAD spatial` because the
+  shared handle also serves the comparables `ST_Centroid` query. `get_summary` deferred to
+  Step 10 (FastAPI is its only caller).
+- `generate` lifted from `scratch/smoke_summaries.py`: forces `emit_summary` tool-use from
+  `GenerationOutput`, parses it; on retry appends `_correction_block(validation_errors)`.
+- Tests (`tests/ai/test_summary_graph.py`, 8): `_route`, `_correction_block`,
+  `_parse_tool_use` (pure), `upsert_summary` (tmp_path DB). No test opens the real DuckDB or
+  calls the API. Full compiled graph not run e2e — its only uncovered node `retrieve` just
+  reads the real marts.
 
 ## Step 9 — `ai/generate_summaries.py`
 
